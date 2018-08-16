@@ -6,7 +6,9 @@ from matplotlib import pyplot as plt
 # Privacy Buckets is based on the following publication
 ####
 
-# [*] S. Meiser, E. Mohammadi, "Tight on Budget? Tight Bounds for r-Fold Approximate Differential Privacy", Proceedings of the 25th ACM Conference on Computer and Communications Security (CCS), 2018  -- to appear
+# [*] S. Meiser, E. Mohammadi, 
+# [*] "Tight on Budget? Tight Bounds for r-Fold Approximate Differential Privacy", 
+# [*] Proceedings of the 25th ACM Conference on Computer and Communications Security (CCS), 2018
 
 # We examine Extended Randomized Repsonse distributions defined as follows
 delta=0.0001
@@ -28,16 +30,16 @@ privacybuckets = ProbabilityBuckets(
         factor = 1 + 1e-4,   # depends on the number_of_buckets and is the multiplicative constant between two buckets.
         dist1_array = distribution_A,  # distribution A
         dist2_array = distribution_B,  # distribution B
-        caching_directory = "./pb-cache",  # chaching makes re-evaluations faster. Can be turned off for some cases.
-        free_infty_budget=10**(-20),  # how much we can put in the infty bucket before squaring
+        caching_directory = "./pb-cache",  # caching makes re-evaluations faster. Can be turned off for some cases.
+        free_infty_budget=10**(-20),  # how much we can put in the infty bucket before first squaring
         error_correction=True,  # error correction. See publication for details
         )
 
 
 # Now we evaluate how the distributon looks after 2**k independent compositions
 k = 13
-privacybuckets_composed = privacybuckets.compose(2**k) # input can be arbitrary positive integer, but exponents of 2 are numerically the most stable  
-
+# input can be arbitrary positive integer, but exponents of 2 are numerically the most stable  
+privacybuckets_composed = privacybuckets.compose(2**k) 
 
 # Print status summary 
 privacybuckets_composed.print_state()
