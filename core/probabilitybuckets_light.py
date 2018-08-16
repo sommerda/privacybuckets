@@ -13,9 +13,6 @@ import pickle
 import errno
 import xxhash
 
-if not os.path.isdir('testcache'):
-    os.makedirs('testcache')
-logging.basicConfig(filename='testcache/current.log')
 
 class ProbabilityBuckets:
 
@@ -52,7 +49,7 @@ class ProbabilityBuckets:
 
         self.create_bucket_distribution(dist1_array, dist2_array, error_correction)
 
-        # setting up caching. Hasing beginning bucket_distribution to avoid name collisions
+        # setting up caching. Hashing beginning bucket_distribution to avoid name collisions
         self.caching_directory = caching_directory
         if caching_directory:
             hasher = xxhash.xxh64(self.bucket_distribution, seed=0)
