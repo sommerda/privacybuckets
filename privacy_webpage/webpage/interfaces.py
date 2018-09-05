@@ -16,7 +16,7 @@ from distributions.noise_gaussian import Gaussian_Noise_1D_mechanism
 from distributions.noise_laplace import Laplace_Noise_1D_mechanism
 from core.probabilitybuckets_light import ProbabilityBuckets
 #from bounds.renyi_privacy import reny_delta_of_eps_efficient
-#from bounds.concentrated_dp import ConcentratedDP
+from bounds.concentrated_dp import ConcentratedDP
 from core.tools import delta_dist_events, include_dist_events, get_sufficient_big_factor, true_delta
 
 def constructPB(module_params, n):
