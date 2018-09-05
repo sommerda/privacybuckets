@@ -1,0 +1,185 @@
+ 
+<!DOCTYPE html>
+<!-- Template by html.am -->
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Submit a Privacy-Bucket request</title>
+    <style type="text/css">
+
+        /* Layout */
+        body {
+            min-width: 630px;
+        }
+
+        #container {
+            padding-left: 200px;
+            padding-right: 190px;
+        }
+        
+        #container .column {
+            position: relative;
+            float: left;
+        }
+        
+        #center {
+            padding: 10px 20px;
+            width: 100%;
+        }
+        
+        #left {
+            width: 180px;
+            padding: 0 10px;
+            right: 240px;
+            margin-left: -100%;
+        }
+        
+        #right {
+            width: 130px;
+            padding: 0 10px;
+            margin-right: -100%;
+        }
+        
+        #footer {
+            clear: both;
+        }
+        
+        /* IE hack */
+        * html #left {
+            left: 150px;
+        }
+
+        /* Make the columns the same height as each other */
+        #container {
+            overflow: hidden;
+        }
+
+        #container .column {
+            padding-bottom: 1001em;
+            margin-bottom: -1000em;
+        }
+
+        /* Fix for the footer */
+        * html body {
+            overflow: hidden;
+        }
+        
+        * html #footer-wrapper {
+            float: left;
+            position: relative;
+            width: 100%;
+            padding-bottom: 10010px;
+            margin-bottom: -10000px;
+            background: #fff;
+        }
+
+        /* Aesthetics */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family:Sans-serif;
+            line-height: 1.5em;
+        }
+        
+        p {
+            color: #555;
+        }
+
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        nav ul a {
+            color: darkgreen;
+            text-decoration: none;
+        }
+
+        #header {
+            font-size: large;
+            padding: 0.3em;
+            background: #fbbd56;
+        }
+
+        #footer {
+            font-size: large;
+            padding: 0.3em;
+            background: #e8cfa5;
+        }
+
+        #left {
+            background: #e8cfa5;
+        }
+        
+        #right {
+            background: #e8cfa5 ;
+        }
+
+        #center {
+            background: #daad86;
+        }
+
+        #container .column {
+            padding-top: 1em;
+        }
+        
+    </style>
+</head>
+
+<body>
+
+    <header id="header"><h1>Privacy Buckets Demo</h1></header>
+
+    <div id="container">
+
+        <main id="center" class="column">
+            <article>
+            
+                <h1>Choose your mode!</h1>
+                Hello and welcome to the Privacy Buckets demo. Here you can chose what you want to examine. You can either use preset Gaussian or Laplacian distributions, or upload your own files. n denotes the number of compositions requested. 
+
+<form method="post" enctype="multipart/form-data" action="result">
+    {% csrf_token %}<p>
+    <h3><input type="radio" name="type" value="Gaussian" checked> Gaussian</h3>
+    <p>
+    sigma: <input name="sigma" type="number" value="4"><br>
+    n: <input name="n_gauss" type="number" value="16"><br>
+</p></p><br>
+    <p>
+    <h3><input type="radio" name="type" value="Laplace"> Laplace</h3>
+    <p>
+    scale: <input name="scale" type="number" value="1"><br>
+    n: <input name="n_lap" type="number" value="8"><br>
+    </p></p><br>
+    <p>
+    <h3><input type="radio" name="type" value="Custom"> Custom</h3>
+    <p>
+    distribution_1: <input type="file" name="distr_1"><br>
+    distribution_2:  <input type="file" name="distr_2"><br>
+    n: <input name="n_cust" type="number" value="2"></p></p><br><br>
+    <p>The distribution files need to have one entry per line which correspond to the probability of the atomic event. Therefore, both files need to have the same number of lines.</p>
+    <p><button type="submit"><h2>Submit</h2></button></p><br>
+  </form>
+It may take some time (up to 10 minutes), as we generate your personalalized graph on the fly. 
+            
+            </article>                              
+        </main>
+
+        <nav id="left" class="column">
+            
+
+        </nav>
+
+        <div id="right" class="column">
+        </div>
+
+    </div>
+
+    <div id="footer-wrapper">
+        <footer id="footer"><p></p></footer>
+    </div>
+
+</body>
+
+</html>
