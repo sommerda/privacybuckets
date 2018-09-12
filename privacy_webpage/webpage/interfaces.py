@@ -19,6 +19,8 @@ from core.probabilitybuckets_light import ProbabilityBuckets
 from bounds.concentrated_dp import ConcentratedDP
 from core.tools import delta_dist_events, include_dist_events, get_sufficient_big_factor, true_delta
 
+BACKGROUNDCOLOR = '#E6E6E8'
+
 def constructPB(module_params, n):
     plots = {\
         'pbup': \
@@ -118,7 +120,7 @@ def convert_plots_to_hexstring(filename, plots, eps_vector, title):
     plt.legend()
     plt.xlabel(r'$\varepsilon$')
     plt.ylabel(r'$\delta(\varepsilon)$')
-    plt.savefig(filename, bbox_inches='tight', dpi = 200)
+    plt.savefig(filename, bbox_inches='tight', dpi = 200, facecolor=BACKGROUNDCOLOR)
     if PLTSHOW:
         plt.show()
     else:
