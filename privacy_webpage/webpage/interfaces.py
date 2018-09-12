@@ -19,6 +19,7 @@ from core.probabilitybuckets_light import ProbabilityBuckets
 # from bounds.renyi_privacy import reny_delta_of_eps_efficient
 # from bounds.concentrated_dp import ConcentratedDP
 from core.tools import delta_dist_events, include_dist_events, get_sufficient_big_factor, true_delta
+from collections import OrderedDict
 
 BACKGROUNDCOLOR = '#E6E6E8'
 
@@ -57,9 +58,6 @@ def constructPB(module_params, n, endpoint = None):
     if 'factor' not in tmp_module_params:
         tmp_module_params['factor'] = get_sufficient_big_factor(tmp_module_params, max_comps = n, target_delta = 3**np.log2(n) * delta_dist_events(tmp_module_params['dist1_array'],tmp_module_params['dist2_array']))
 
-    # if module_params['verbose']:
-    #     print(tmp_module_params)
-    #
     pb = ProbabilityBuckets(**tmp_module_params)
     pbn = pb.compose(n)
     moment = lambda p, lam: np.log(tmp_module_params['factor']) * np.sum(np.multiply( np.power(np.arange(len(p)) - len(p)/2, lam), p))
@@ -90,8 +88,8 @@ def constructPB(module_params, n, endpoint = None):
 
 
     # PB
-    plots['pbup']['ydata'] = [pbn.delta_of_eps_upper_bound(eps) for eps in eps_vector]
-    plots['pblow']['ydata'] = [pbn.delta_of_eps_lower_bound(eps) for eps in eps_vector]
+    plots['pbup']['ydata'] = np.asarray([pbn.delta_of_eps_upper_bound(eps) for eps in eps_vector])
+    plots['pblow']['ydata'] = np.asarray([pbn.delta_of_eps_lower_bound(eps) for eps in eps_vector])
 
     # # Renyi-DP
     # plots['rdp']['ydata'] = reny_delta_of_eps_efficient(eps_vector, n, pb.bucket_distribution, pb.log_factor, None)
@@ -111,12 +109,11 @@ def convert_plots_to_hexstring(filename, figures, eps_vector, titles):
         plt.title(title)
         logymin = 10**100
         logymax = -200
-        plt.yscale('log')
         for index, plot in plots['dict'].items():
             if 'ydata' in plot:
                 plt.semilogy(plot['xdata'], plot['ydata'], linestyle = plot['linestyle'], \
                             color = plot['color'], alpha = 0.5, label = plot['name'])
-                sanitizedy = np.asarray(plot['ydata'])[np.nonzero(plot['ydata'])]
+                sanitizedy = plot['ydata'][np.nonzero(plot['ydata'])]
                 logymin = min(logymin, np.log10(np.min(sanitizedy)))
                 logymax = max(logymax, np.log10(np.max(sanitizedy)))
         yticks = np.logspace(logymin, logymax, num = 5)
@@ -124,7 +121,6 @@ def convert_plots_to_hexstring(filename, figures, eps_vector, titles):
         plt.xlabel(plots['x axis'])
         plt.ylabel(plots['y axis'])
         plt.legend()
-        # plt.tight_layout()
     plt.savefig(filename, bbox_inches='tight', dpi = 200, facecolor=BACKGROUNDCOLOR)
     if PLTSHOW:
         plt.show()
@@ -142,8 +138,9 @@ def convert_plots_to_hexstring(filename, figures, eps_vector, titles):
 
 def construct_image(module_params, n, filename, titles, dual = False):
     
-    figures = {}
+    figures = OrderedDict()
     
+    ##### Event space plots
     real_plots = {}
     real_plots['dist1'] = {\
             'ydata' : module_params['dist1_array'],
@@ -162,6 +159,8 @@ def construct_image(module_params, n, filename, titles, dual = False):
             'x axis' : 'event',
             'y axis' : 'Pr[event]'}
     
+    ##### Bucket space plots
+
     adp_plots1, eps_vector, pb, pbn = constructPB(module_params, n)
     adp_plots = {}
     adp_plots['pbup'] = {\
@@ -220,6 +219,8 @@ def construct_image(module_params, n, filename, titles, dual = False):
             'x axis' : 'bucket index i',
             'y axis' : 'B(i)'}
 
+    ##### ADP plots
+    
     # place adp_plots at the end
     figures['ADP epsilon-delta graph'] = {\
             'dict' : adp_plots,
@@ -273,10 +274,6 @@ def executeLaplace(sigma, n, number_of_buckets = 10**5, truncation_at = None):
     return image_1
 
 def executeHistogram(dist1, dist2, n, number_of_buckets = 10**5):
-    # dist1 = np.float64(np.asarray([(x.split(',')[-1]).strip() for x in dist1.splitlines()]))
-    # dist2 = np.float64(np.asarray([(x.split(',')[-1]).strip() for x in dist2.splitlines()]))
-    # dist1 = np.float64([x.strip() for x in dist1.splitlines()])
-    # dist2 = np.float64([x.strip() for x in dist2.splitlines()])
     dist1 = np.float64(dist1.splitlines())
     dist2 = np.float64(dist2.splitlines())
     if dist1.shape != dist2.shape:
