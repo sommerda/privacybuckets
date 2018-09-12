@@ -110,7 +110,7 @@ def convert_plots_to_hexstring(filename, figures, eps_vector, titles):
         i += 1
         plt.subplot(3,1,i)
         plt.title(title)
-        plt.yscale('log')
+        # plt.yscale('log')
         for index, plot in plots['dict'].items():
             if 'ydata' in plot:
                 plt.semilogy(plot['xdata'], plot['ydata'], linestyle = plot['linestyle'], \
