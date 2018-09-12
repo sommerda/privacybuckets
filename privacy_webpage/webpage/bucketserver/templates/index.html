@@ -99,25 +99,26 @@
         #header {
             font-size: large;
             padding: 0.3em;
-            background: #fbbd56;
+            background: #300032;
+			color: #e6e6e8;
         }
 
         #footer {
             font-size: large;
             padding: 0.3em;
-            background: #e8cfa5;
+            background: #300032;
         }
 
         #left {
-            background: #e8cfa5;
+            background: #c43235;
         }
         
         #right {
-            background: #e8cfa5 ;
+            background: #c43235 ;
         }
 
         #center {
-            background: #daad86;
+            background: #e6e6e8;
         }
 
         #container .column {
@@ -128,7 +129,7 @@
 </head>
 
 <body>
-
+<center>
     <header id="header"><h1>Privacy Buckets Demo</h1></header>
 
     <div id="container">
@@ -137,7 +138,7 @@
             <article>
             
                 <h1>Choose your mode!</h1>
-                Hello and welcome to the Privacy Buckets demo. Here you can chose what you want to examine. You can either use preset Gaussian or Laplacian distributions, or upload your own files. n denotes the number of compositions requested. 
+                Hello and welcome to the Privacy Buckets demo. Here you can choose what you want to examine. You can either use preset Gauss or Laplace distributions, or upload your own files. n denotes the number of compositions requested. 
 
 <form method="post" enctype="multipart/form-data" action="result">
     {% csrf_token %}<p>
@@ -161,7 +162,7 @@
     <p>The distribution files need to have one entry per line which correspond to the probability of the atomic event. Therefore, both files need to have the same number of lines.</p>
     <p><button type="submit"><h2>Submit</h2></button></p><br>
   </form>
-It may take some time (up to 10 minutes), as we generate your personalalized graph on the fly. 
+It may take some time (up to 10 minutes), as we generate your personalized graph on the fly. 
             
             </article>                              
         </main>
@@ -179,7 +180,7 @@ It may take some time (up to 10 minutes), as we generate your personalalized gra
     <div id="footer-wrapper">
         <footer id="footer"><p></p></footer>
     </div>
-
+</center>
 </body>
 
 </html>
