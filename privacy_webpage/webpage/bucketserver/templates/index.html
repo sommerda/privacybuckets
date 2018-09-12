@@ -124,7 +124,7 @@
         #container .column {
             padding-top: 1em;
         }
-        
+		
     </style>
 </head>
 
@@ -144,14 +144,27 @@
     {% csrf_token %}<p>
     <h3><input type="radio" name="type" value="Gaussian" checked> Gaussian</h3>
     <p>
-    sigma: <input name="sigma" type="number" value="4"><br>
-    n: <input name="n_gauss" type="number" value="16"><br>
+	<table>
+	<tr>
+		<td align="right">sigma:</td><td><input name="sigma" type="number" value="4"></td>
+	</tr>
+	<tr>
+		<td align="right">n:</td><td><input name="n_gauss" type="number" value="16"></td>
+	</tr>
+	</table>
 </p></p><br>
     <p>
     <h3><input type="radio" name="type" value="Laplace"> Laplace</h3>
     <p>
-    scale: <input name="scale" type="number" value="1"><br>
-    n: <input name="n_lap" type="number" value="8"><br>
+	<table>
+	<tr>
+		<td align="right">scale:</td><td><input name="scale" type="number" value="1"></td>
+	</tr>
+	<tr>
+		<td align="right">n:</td><td><input name="n_lap" type="number" value="8"></td>
+	</tr>
+	</table>
+
     </p></p><br>
     <p>
     <h3><input type="radio" name="type" value="Custom"> Custom</h3>
