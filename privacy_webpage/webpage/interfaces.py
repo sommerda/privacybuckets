@@ -109,15 +109,16 @@ def convert_plots_to_hexstring(filename, figures, eps_vector, titles):
     for title,plots in figures.items():
         i += 1
         plt.subplot(3,1,i)
-        for index, plot in plots['dict'].items():
-            if 'ydata' in plot:
-                plt.plot(plot['xdata'], plot['ydata'], linestyle = plot['linestyle'], \
-                            color = plot['color'], alpha = 0.5, label = plot['name'])
-        plt.yscale('log')
         plt.title(title)
         plt.legend()
         plt.xlabel(plots['x axis'])
         plt.ylabel(plots['y axis'])
+        plt.yscale('log')
+        for index, plot in plots['dict'].items():
+            if 'ydata' in plot:
+                plt.plot(plot['xdata'], plot['ydata'], linestyle = plot['linestyle'], \
+                            color = plot['color'], alpha = 0.5, label = plot['name'])
+        plt.tight_layout()
     plt.savefig(filename, bbox_inches='tight', dpi = 200, facecolor=BACKGROUNDCOLOR)
     if PLTSHOW:
         plt.show()
