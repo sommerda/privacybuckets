@@ -1,5 +1,5 @@
-PLTSHOW = False
 # written by David Sommer (david.sommer at inf.ethz.ch), and Esfandiar Mohammadi (mohammadi at inf.ethz.ch)
+PLTSHOW = False
 import sys
 import os
 import csv
@@ -103,24 +103,28 @@ def convert_plots_to_hexstring(filename, figures, eps_vector, titles):
     filename = filename + str(np.random.randint(10000)) + "." + filetype
     plt.figure(figsize=(8,8))
     plt.title(titles[0])
-    # plots = figures[-1]
     i = 0
     plt.subplots_adjust(hspace=0.6)
     for title,plots in figures.items():
         i += 1
         plt.subplot(3,1,i)
         plt.title(title)
+        logymin = 10**100
+        logymax = -200
+        plt.yscale('log')
         for index, plot in plots['dict'].items():
             if 'ydata' in plot:
                 plt.semilogy(plot['xdata'], plot['ydata'], linestyle = plot['linestyle'], \
                             color = plot['color'], alpha = 0.5, label = plot['name'])
-        yticks = np.logspace(np.log10(np.min(plot['ydata'])), np.log10(np.max(plot['ydata'])), num = 5)
-        plt.yticks(yticks)
-        plt.yscale('log')
+                sanitizedy = np.asarray(plot['ydata'])[np.nonzero(plot['ydata'])]
+                logymin = min(logymin, np.log10(np.min(sanitizedy)))
+                logymax = max(logymax, np.log10(np.max(sanitizedy)))
+        yticks = np.logspace(logymin, logymax, num = 5)
+        plt.yticks(yticks, ["{:.2E}".format(y) for y in yticks])
         plt.xlabel(plots['x axis'])
         plt.ylabel(plots['y axis'])
         plt.legend()
-        plt.tight_layout()
+        # plt.tight_layout()
     plt.savefig(filename, bbox_inches='tight', dpi = 200, facecolor=BACKGROUNDCOLOR)
     if PLTSHOW:
         plt.show()
@@ -305,19 +309,20 @@ if __name__ == '__main__':
     # b_full = np.convolve(np.convolve(b, a, mode="full"), b, mode="full")
     # a_full /= np.float64(np.sum(a_full))
     # b_full /= np.float64(np.sum(b_full))
-    file1 = 'new1.txt'
-    file2 = 'new2.txt'
-    with open(file1, 'r') as myfile:
-        a_string = myfile.read()
-    # print(a_string)
-    with open(file2, 'r') as myfile:
-        b_string = myfile.read()
+    # file1 = 'new1.txt'
+    # file2 = 'new2.txt'
+    # with open(file1, 'r') as myfile:
+    #     a_string = myfile.read()
+    # # print(a_string)
+    # with open(file2, 'r') as myfile:
+    #     b_string = myfile.read()
     # print(b_string)
     # b_string = b'1\r\n123\r\n5\r\n12\r\n3\r\n4\r\n11\r\n32\r\n3\r\n3\r\n3\r\n5\r\n5\r\n4\r\n4\r\n4\r\n43\r\n34\r\n0\r\n34'
     # a_string = b'2\r\n110\r\n0\r\n7\r\n4\r\n4\r\n10\r\n34\r\n3\r\n3\r\n4\r\n4\r\n4\r\n4\r\n3\r\n4\r\n43\r\n34\r\n4\r\n3'
     try:
-        image = executeHistogram(a_string, b_string, 2**2)
+        # image = executeHistogram(a_string, b_string, 2**2)
         # image = executeGaussian(100, 2**4)
+        image = executeGaussian(1, 2**5)
         if not PLTSHOW:
             with open('tmp.base64', 'w') as myfile:
                 myfile.write(image)
