@@ -117,8 +117,8 @@ def convert_plots_to_hexstring(filename, figures, eps_vector, titles):
                 # sanitizedy = plot['ydata'][np.nonzero(plot['ydata'])]
                 # logymin = min(logymin, np.log10(np.min(sanitizedy)))
                 # logymax = max(logymax, np.log10(np.max(sanitizedy)))
-        plt.gca().yaxis.set_major_formatter(LogFormatterMathtext())
-        plt.gca().yaxis.set_minor_formatter(NullFormatter())
+        plt.gca().yaxis.set_major_formatter(LogFormatterMathtext(base=10, labelOnlyBase=False))
+        plt.gca().yaxis.set_minor_formatter(LogFormatterMathtext(base=10, labelOnlyBase=False))
         # yticks = np.logspace(logymin, logymax, num = 5)
         # plt.yticks(yticks, ["{:.2E}".format(y) for y in yticks])
         plt.xlabel(plots['x axis'])
