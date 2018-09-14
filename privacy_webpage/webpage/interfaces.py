@@ -114,13 +114,16 @@ def convert_plots_to_hexstring(filename, figures, eps_vector, titles):
             if 'ydata' in plot:
                 plt.semilogy(plot['xdata'], plot['ydata'], linestyle = plot['linestyle'], \
                             color = plot['color'], alpha = 0.5, label = plot['name'])
-                # sanitizedy = plot['ydata'][np.nonzero(plot['ydata'])]
-                # logymin = min(logymin, np.log10(np.min(sanitizedy)))
-                # logymax = max(logymax, np.log10(np.max(sanitizedy)))
-        plt.gca().yaxis.set_major_formatter(LogFormatterMathtext(base=10, labelOnlyBase=False))
-        plt.gca().yaxis.set_minor_formatter(LogFormatterMathtext(base=10, labelOnlyBase=False))
-        # yticks = np.logspace(logymin, logymax, num = 5)
+                sanitizedy = plot['ydata'][np.nonzero(plot['ydata'])]
+                logymin = min(logymin, np.log10(np.min(sanitizedy)))
+                logymax = max(logymax, np.log10(np.max(sanitizedy)))
+        yticks = np.logspace(logymin, logymax, num = 5)
+        plt.yticks(yticks)
         # plt.yticks(yticks, ["{:.2E}".format(y) for y in yticks])
+        plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:.2E}'))
+        plt.gca().yaxis.set_minor_formatter(NullFormatter())
+        # plt.gca().yaxis.set_major_formatter(LogFormatterMathtext(base=10, labelOnlyBase=False))
+        # plt.gca().yaxis.set_minor_formatter(LogFormatterMathtext(base=10, labelOnlyBase=False))
         plt.xlabel(plots['x axis'])
         plt.ylabel(plots['y axis'])
         plt.legend()
