@@ -10,6 +10,7 @@ import matplotlib
 if not PLTSHOW:
     matplotlib.use('Agg')
 from matplotlib import pyplot as plt
+from matplotlib.ticker import LogFormatterMathtext, NullFormatter
 import base64
 import binascii
 sys.path.insert(0, "../")
@@ -111,14 +112,15 @@ def convert_plots_to_hexstring(filename, figures, eps_vector, titles):
         logymax = -200
         for index, plot in plots['dict'].items():
             if 'ydata' in plot:
-                plt.plot(plot['xdata'], plot['ydata'], linestyle = plot['linestyle'], \
+                plt.semilogy(plot['xdata'], plot['ydata'], linestyle = plot['linestyle'], \
                             color = plot['color'], alpha = 0.5, label = plot['name'])
-                sanitizedy = plot['ydata'][np.nonzero(plot['ydata'])]
-                logymin = min(logymin, np.log10(np.min(sanitizedy)))
-                logymax = max(logymax, np.log10(np.max(sanitizedy)))
-        plt.yscale('log')
-        yticks = np.logspace(logymin, logymax, num = 5)
-        plt.yticks(yticks, ["{:.2E}".format(y) for y in yticks])
+                # sanitizedy = plot['ydata'][np.nonzero(plot['ydata'])]
+                # logymin = min(logymin, np.log10(np.min(sanitizedy)))
+                # logymax = max(logymax, np.log10(np.max(sanitizedy)))
+        plt.gca().yaxis.set_major_formatter(LogFormatterMathtext())
+        plt.gca().yaxis.set_minor_formatter(NullFormatter())
+        # yticks = np.logspace(logymin, logymax, num = 5)
+        # plt.yticks(yticks, ["{:.2E}".format(y) for y in yticks])
         plt.xlabel(plots['x axis'])
         plt.ylabel(plots['y axis'])
         plt.legend()
