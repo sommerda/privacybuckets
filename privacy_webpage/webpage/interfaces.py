@@ -10,7 +10,7 @@ import matplotlib
 if not PLTSHOW:
     matplotlib.use('Agg')
 from matplotlib import pyplot as plt
-from matplotlib.ticker import StrMethodFormatter, LogFormatterMathtext, NullFormatter
+from matplotlib.ticker import StrMethodFormatter, NullFormatter
 import base64
 import binascii
 sys.path.insert(0, "../")
@@ -119,11 +119,8 @@ def convert_plots_to_hexstring(filename, figures, eps_vector, titles):
                 logymax = max(logymax, np.log10(np.max(sanitizedy)))
         yticks = np.logspace(logymin, logymax, num = 5)
         plt.yticks(yticks)
-        # plt.yticks(yticks, ["{:.2E}".format(y) for y in yticks])
         plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:.2E}'))
         plt.gca().yaxis.set_minor_formatter(NullFormatter())
-        # plt.gca().yaxis.set_major_formatter(LogFormatterMathtext(base=10, labelOnlyBase=False))
-        # plt.gca().yaxis.set_minor_formatter(LogFormatterMathtext(base=10, labelOnlyBase=False))
         plt.xlabel(plots['x axis'])
         plt.ylabel(plots['y axis'])
         plt.legend()
