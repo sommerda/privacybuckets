@@ -111,7 +111,7 @@ def convert_plots_to_hexstring(filename, figures, eps_vector, titles):
         logymax = -200
         for index, plot in plots['dict'].items():
             if 'ydata' in plot:
-                plt.semilogy(plot['xdata'], plot['ydata'], linestyle = plot['linestyle'], \
+                plt.plot(plot['xdata'], plot['ydata'], linestyle = plot['linestyle'], \
                             color = plot['color'], alpha = 0.5, label = plot['name'])
                 sanitizedy = plot['ydata'][np.nonzero(plot['ydata'])]
                 logymin = min(logymin, np.log10(np.min(sanitizedy)))
