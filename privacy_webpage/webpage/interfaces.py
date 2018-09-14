@@ -10,7 +10,7 @@ import matplotlib
 if not PLTSHOW:
     matplotlib.use('Agg')
 from matplotlib import pyplot as plt
-from matplotlib.ticker import LogFormatterMathtext, NullFormatter
+from matplotlib.ticker import StrMethodFormatter, LogFormatterMathtext, NullFormatter
 import base64
 import binascii
 sys.path.insert(0, "../")
