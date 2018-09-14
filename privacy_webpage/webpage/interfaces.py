@@ -116,6 +116,7 @@ def convert_plots_to_hexstring(filename, figures, eps_vector, titles):
                 sanitizedy = plot['ydata'][np.nonzero(plot['ydata'])]
                 logymin = min(logymin, np.log10(np.min(sanitizedy)))
                 logymax = max(logymax, np.log10(np.max(sanitizedy)))
+        plt.yscale('log')
         yticks = np.logspace(logymin, logymax, num = 5)
         plt.yticks(yticks, ["{:.2E}".format(y) for y in yticks])
         plt.xlabel(plots['x axis'])
