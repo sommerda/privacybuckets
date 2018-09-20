@@ -12,6 +12,7 @@ import os
 import pickle
 import errno
 import xxhash
+import sys
 
 
 class ProbabilityBuckets:
@@ -62,9 +63,12 @@ class ProbabilityBuckets:
 
     def logger_setup(self, level):
         self.logger = logging.getLogger(__name__)  # all instances use the same logger. Randomize the name if not appreciated
+        # hack to make it work with web page stdout redirect
+        for hdlr in self.logger.handlers:
+            self.logger.removeHandler(hdlr)
         if not len(self.logger.handlers):
             self.logger.setLevel(level=level)
-            ch = logging.StreamHandler()
+            ch = logging.StreamHandler(sys.stdout)
             ch.setLevel(level=level)
             ch.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s: %(message)s'))
             self.logger.addHandler(ch)
