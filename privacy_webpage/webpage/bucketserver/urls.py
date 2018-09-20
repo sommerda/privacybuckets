@@ -17,12 +17,10 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url
 
-
-from .view import result, main_site
+from .view import main_site
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url("result", result),
     url("", main_site),
 ]

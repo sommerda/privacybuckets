@@ -1,4 +1,5 @@
 # written by David Sommer (david.sommer at inf.ethz.ch), and Esfandiar Mohammadi (mohammadi at inf.ethz.ch)
+
 PLTSHOW = False
 import sys
 import os
@@ -140,9 +141,9 @@ def convert_plots_to_hexstring(filename, figures, eps_vector, titles):
 
 
 def construct_image(module_params, n, filename, titles, dual = False):
-    
+
     figures = OrderedDict()
-    
+
     ##### Event space plots
     real_plots = {}
     real_plots['dist1'] = {\
@@ -161,7 +162,7 @@ def construct_image(module_params, n, filename, titles, dual = False):
             'dict' : real_plots,
             'x axis' : 'event',
             'y axis' : 'Pr[event]'}
-    
+
     ##### Bucket space plots
 
     adp_plots1, eps_vector, pb, pbn = constructPB(module_params, n)
@@ -198,7 +199,7 @@ def construct_image(module_params, n, filename, titles, dual = False):
     #     zcdp.self_compose_iterated_squaring(math.ceil(np.log2(n)))
     #     adp_plots['cdp']['ydata'] = [ include_dist_events(zcdp.delta_of_eps(eps), delta_dist_events_0, n)\
     #                  for eps in eps_vector ]
-    
+
 
     pld_plots = {}
     pld_plots['initial'] = {\
@@ -216,14 +217,14 @@ def construct_image(module_params, n, filename, titles, dual = False):
             'color' : 'brown',
             'linestyle' : 'dashed',
     }
-    
+
     figures['Bucket distribution'] = {\
             'dict' : pld_plots,
             'x axis' : 'bucket index i',
             'y axis' : 'B(i)'}
 
     ##### ADP plots
-    
+
     # place adp_plots at the end
     figures['ADP epsilon-delta graph'] = {\
             'dict' : adp_plots,
@@ -232,7 +233,7 @@ def construct_image(module_params, n, filename, titles, dual = False):
 
     image_1 = convert_plots_to_hexstring(filename, figures, eps_vector, titles)
     return image_1
-    
+
 
 def executeGaussian(sigma, n, number_of_buckets = 10**5, truncation_at = None):
     mean_diff = 1 # has to be an integer, as it is used for computing length of arrays in the implementation
@@ -251,7 +252,7 @@ def executeGaussian(sigma, n, number_of_buckets = 10**5, truncation_at = None):
                 'factor' : factor,
                 'verbose' : False,
     }
-    
+
     image_1 = construct_image(module_params, n, 'gauss.png', ['Gaussian mechanism with ' + r'$\sigma = $' + str(sigma) + " and " + str(n) + " compositions"])
     return image_1
 
@@ -286,7 +287,7 @@ def executeHistogram(dist1, dist2, n, number_of_buckets = 10**5):
         dist2_tmp = np.convolve(np.convolve(dist2, dist1, mode="full"), dist2, mode="full")
         dist1 = dist1_tmp
         dist2 = dist2_tmp
-        
+
     dist1_tmp = dist1/np.sum(dist1)
     dist2_tmp = dist2/np.sum(dist2)
     print(true_delta(dist1_tmp,dist2_tmp))
