@@ -91,12 +91,8 @@ function send_form_data(form, websocket){
         var arrayBuffer = this.result; 
         var array = new Uint8Array(arrayBuffer);
         var binaryString = new TextDecoder("utf-8").decode(array);
-        //var binaryString = String.fromCharCode.apply(null, array);
-        console.log(binaryString);
-        console.log(this.key);
 
         var data = { 'name': this.key, 'data' : binaryString };
-        
         websocket.send( JSON.stringify( { 'type': 'file', 'data': data } ) );
       };
       reader.readAsArrayBuffer(value);

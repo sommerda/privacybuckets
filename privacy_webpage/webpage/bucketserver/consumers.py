@@ -1,6 +1,7 @@
 # written by David Sommer (david.sommer at inf.ethz.ch)
 
 import io
+import sys
 import json
 from time import sleep
 from threading import Thread
@@ -8,7 +9,6 @@ from contextlib import redirect_stdout
 from channels.generic.websocket import WebsocketConsumer
 
 
-import sys
 sys.path.insert(0, "../")
 from interfaces import executeGaussian, executeLaplace, executeHistogram
 
@@ -23,23 +23,18 @@ class Consumer(WebsocketConsumer):
         self.accept()
 
     def disconnect(self, close_code):
-        print("DISONNECT")
+        pass
 
     def abort(self):
-        print("Abort")
         self.send_console_output("ERROR: reload browser tab!")
         self.close()
 
     def receive(self, text_data):
-        print(text_data)
-
-        # query_details = self.parse_query_string(text_data)
         f = io.StringIO()
         with redirect_stdout(f):
             ready = self.parse_parameters(text_data)
 
             if ready:
-                # thread = Thread(target = compute_request, kwargs = {'parameters': self.parameters, 'distr_1': self.distr_1, 'distr_2': self.distr_2})
                 thread = ComputationThread(parameters = self.parameters, distr_1 = self.distr_1, distr_2 = self.distr_2)
                 thread.start()
 
@@ -63,6 +58,7 @@ class Consumer(WebsocketConsumer):
                 self.send(json.dumps(image_answer))
 
                 # we are done
+                self.send_console_output("Done")
                 self.close()
 
     # parses parameters and decides if all required parameters have been received.
@@ -115,7 +111,6 @@ class ComputationThread(Thread):
         super(ComputationThread, self).__init__()
 
     def run(self):
-
         da_type = self.parameters['type']
         if da_type == 'Gaussian':
             n_gaussian = int(self.parameters['n_gauss'])
