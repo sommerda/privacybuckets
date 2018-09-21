@@ -250,7 +250,6 @@ def executeGaussian(sigma, n, number_of_buckets = 10**5, truncation_at = None):
                 'dist1_array' : mechs.y1,
                 'dist2_array' : mechs.y2,
                 'factor' : factor,
-                'verbose' : False,
     }
 
     image_1 = construct_image(module_params, n, 'gauss.png', ['Gaussian mechanism with ' + r'$\sigma = $' + str(sigma) + " and " + str(n) + " compositions"])
@@ -271,7 +270,6 @@ def executeLaplace(sigma, n, number_of_buckets = 10**5, truncation_at = None):
                 'dist1_array' : mechs.y1,
                 'dist2_array' : mechs.y2,
                 'factor' : factor,
-                'verbose' : False,
     }
 
     image_1 = construct_image(module_params, n, 'laplace.png', ['Laplace mechanism with ' + r'$\lambda = $' + str(sigma) + " and " + str(n) + " compositions"])
@@ -295,7 +293,6 @@ def executeHistogram(dist1, dist2, n, number_of_buckets = 10**5):
                 'number_of_buckets' : number_of_buckets,
                 'dist1_array' : dist1_tmp,
                 'dist2_array' : dist2_tmp,
-                'verbose' : False,
     }
 
     image_1 = construct_image(module_params, n, 'histogram.png', ['Custom distribution pair after ' + str(n) + " compositions"], dual = True)
