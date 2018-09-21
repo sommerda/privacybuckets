@@ -109,6 +109,7 @@ nav ul a {
 }
 
 #center {
+    min-height: 90%;
     background: #e6e6e8;
 }
 
@@ -124,4 +125,14 @@ nav ul a {
     font-size: 10pt;
     padding: 5px;
     text-align: left;
+}
+
+a.button {
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+
+    text-decoration: none;
+    color: initial;
+    display: inline;
 }
