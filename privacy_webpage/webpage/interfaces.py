@@ -218,7 +218,7 @@ def construct_image(module_params, n, filename, titles, dual = False):
             'linestyle' : 'dashed',
     }
 
-    figures['privacy loss distribution'] = {\
+    figures['Privacy loss distribution'] = {\
             'dict' : pld_plots,
             'x axis' : 'ε',
             'y axis' : 'Loss(ε)'}
