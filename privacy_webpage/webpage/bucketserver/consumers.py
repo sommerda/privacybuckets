@@ -59,6 +59,10 @@ class Consumer(WebsocketConsumer):
 
                 # we are done
                 self.send_console_output("Done")
+
+                # improper, but I do not know another way to verify that all messages have been sent
+                sleep(0.5)
+
                 self.close()
 
     # parses parameters and decides if all required parameters have been received.
