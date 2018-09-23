@@ -204,7 +204,7 @@ def construct_image(module_params, n, filename, titles, dual = False):
     pld_plots = {}
     pld_plots['initial'] = {\
             'ydata' : pb.bucket_distribution,
-            'xdata' : range(len(pb.bucket_distribution)),
+            'xdata' : (np.arange(len(pb.bucket_distribution))- pb.one_index ) * pb.log_factor,
             'name' : 'initial',
             'color' : 'blue',
             'linestyle' : 'solid',
@@ -212,16 +212,16 @@ def construct_image(module_params, n, filename, titles, dual = False):
 
     pld_plots['final'] = {\
             'ydata' : pbn.bucket_distribution,
-            'xdata' : range(len(pb.bucket_distribution)),
+            'xdata' : (np.arange(len(pbn.bucket_distribution))- pbn.one_index ) * pbn.log_factor,
             'name' : 'after composition',
             'color' : 'brown',
             'linestyle' : 'dashed',
     }
 
-    figures['Bucket distribution'] = {\
+    figures['privacy loss distribution'] = {\
             'dict' : pld_plots,
-            'x axis' : 'bucket index i',
-            'y axis' : 'B(i)'}
+            'x axis' : 'ε',
+            'y axis' : 'Loss(ε)'}
 
     ##### ADP plots
 
