@@ -34,26 +34,27 @@
 
                     <!--form name="request_form" method="post" enctype="multipart/form-data" action="result"-->
                     <form id="request_form" enctype="multipart/form-data">
-                        {% csrf_token %}<p>
-                            <h3><input type="radio" name="type" value="Gaussian" checked> Gaussian</h3>
+                        {% csrf_token %}
+						<p>
+                            <h3>Number of compositions</h3>
                             <p>
-                                sigma: <input name="sigma" type="number" value="4"><br>
-                                n: <input name="n_gauss" type="number" value="16"><br>
+                                n: <input name="n_param" type="number" value="16"><br>
                             </p>
                         </p><br>
-                        <p>
-                            <h3><input type="radio" name="type" value="Laplace"> Laplace</h3>
-                            <p>
-                                scale: <input name="scale" type="number" value="1"><br>
-                                n: <input name="n_lap" type="number" value="8"><br>
-                            </p>
+						<hr>
+						<p>
+                            <h3><input type="radio" name="type" value="Gaussian" checked> Gaussian with 
+                                sigma: <input name="sigma" type="number" value="4">
+							</h3>
                         </p><br>
                         <p>
-                            <h3><input type="radio" name="type" value="Custom"> Custom</h3>
+                            <h3><input type="radio" name="type" value="Laplace"> Laplace with scale parameter lambda: <input name="scale" type="number" value="1"></h3>
+                        </p><br>
+                        <p>
+                            <h3><input type="radio" name="type" value="Custom"> Custom Histograms</h3>
                             <p>
                                 distribution_1: <input type="file" name="distr_1"><br>
                                 distribution_2:  <input type="file" name="distr_2"><br>
-                                n: <input name="n_cust" type="number" value="2">
                             </p>
                         </p><br><br>
                         <p>The distribution files need to have one entry per line which correspond to the probability of the atomic event. Therefore, both files need to have the same number of lines.</p>

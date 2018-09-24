@@ -117,18 +117,18 @@ class ComputationThread(Thread):
     def run(self):
         da_type = self.parameters['type']
         if da_type == 'Gaussian':
-            n_gaussian = int(self.parameters['n_gauss'])
+            n_gaussian = int(self.parameters['n_param'])
             sigma = int(self.parameters['sigma'])
             print("Gaussian",sigma, n_gaussian)
             self.image_1 = executeGaussian(sigma, n_gaussian)
         elif da_type == 'Laplace':
-            n_lap = int(self.parameters['n_lap'])
+            n_lap = int(self.parameters['n_param'])
             scale = int(self.parameters['scale'])
             print("laplace",scale, n_lap)
             self.image_1 = executeLaplace(scale, n_lap)
         elif da_type == 'Custom':
             print("custom")
-            n_cust = int(self.parameters['n_cust'])
+            n_cust = int(self.parameters['n_param'])
             print("custom distr_1 distr_2")
             self.image_1 = executeHistogram(self.distr_1, self.distr_2, n_cust)
         else:
