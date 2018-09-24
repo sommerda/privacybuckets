@@ -118,12 +118,12 @@ class ComputationThread(Thread):
         da_type = self.parameters['type']
         if da_type == 'Gaussian':
             n_gaussian = int(self.parameters['n_param'])
-            sigma = int(self.parameters['sigma'])
+            sigma = float(self.parameters['sigma'])
             print("Gaussian",sigma, n_gaussian)
             self.image_1 = executeGaussian(sigma, n_gaussian)
         elif da_type == 'Laplace':
             n_lap = int(self.parameters['n_param'])
-            scale = int(self.parameters['scale'])
+            scale = float(self.parameters['scale'])
             print("laplace",scale, n_lap)
             self.image_1 = executeLaplace(scale, n_lap)
         elif da_type == 'Custom':

@@ -22,5 +22,5 @@ from .view import main_site
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url("", main_site),
+    url("^$", main_site),
 ]
