@@ -38,7 +38,7 @@ class Virtual_Noise_1D_mechanism(object):
     def __init__(self, mean_diff, eps, truncation_at=10, granularity=100, scale=1, target_distribution=None):
         self.noise = Virtual_Noise_1D(eps, None, truncation_at, granularity, scale, target_distribution)
 
-        shift = mean_diff * granularity
+        shift = int(mean_diff * granularity)  # round downwards
 
         self.y1 = np.zeros(shift + self.noise.number_of_events)
         self.y1[:self.noise.number_of_events] = self.noise.distribution

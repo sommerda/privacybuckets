@@ -30,8 +30,8 @@ class Gaussian_Noise_1D_mechanism(Virtual_Noise_1D_mechanism):
 
     The two outcomes are stored in self.y1 and self.y2, and an x-axis is provided by self.x
     """
-    def __init__(self, mean_diff, eps, truncation_at=10, granularity=100, sigma=1):
-        super(Gaussian_Noise_1D_mechanism, self).__init__(mean_diff, eps, truncation_at=truncation_at, granularity=granularity, scale=sigma, target_distribution=norm)
+    def __init__(self, mean_diff, eps, truncation_at=10, granularity=100, scale=1):
+        super(Gaussian_Noise_1D_mechanism, self).__init__(mean_diff, eps, truncation_at=truncation_at, granularity=granularity, scale=scale, target_distribution=norm)
 
 
 if __name__ == "__main__":
