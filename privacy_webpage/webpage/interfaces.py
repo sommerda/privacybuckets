@@ -132,13 +132,13 @@ def convert_plots_to_hexstring(figures, eps_vector, titles, filetype='png'):
         plt.ylabel(plots['y axis'])
         plt.legend()
 
-    f = io.BytesIO()
-    plt.savefig(f, format=filetype, bbox_inches='tight', dpi = 200, facecolor=BACKGROUNDCOLOR)
+    with io.BytesIO() as f:
+        plt.savefig(f, format=filetype, bbox_inches='tight', dpi = 200, facecolor=BACKGROUNDCOLOR)
 
-    f.seek(0)
-    b64string = base64.b64encode(f.read())
+        f.seek(0)
+        b64string = base64.b64encode(f.read()).decode('utf-8')
 
-    return 'data:image/' + filetype + ';base64, ' + b64string.decode('utf-8')
+    return 'data:image/' + filetype + ';base64, ' + b64string
 
 
 def construct_image(module_params, n, titles, dual = False):
