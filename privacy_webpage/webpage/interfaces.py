@@ -316,7 +316,7 @@ def executeHistogram(dist1, dist2, n, number_of_buckets = 10**5):
                 'dist2_array': dist2_tmp,
     }
 
-    image_1 = construct_image(module_params, n, 'histogram.png', ['Custom distribution pair after ' + str(n) + " compositions"], dual = True)
+    image_1 = construct_image(module_params, n, ['Custom distribution pair after ' + str(n) + " compositions"], dual = True)
     return image_1
 
 if __name__ == '__main__':
@@ -331,19 +331,21 @@ if __name__ == '__main__':
     # b_full /= np.float64(np.sum(b_full))
     # file1 = 'new1.txt'
     # file2 = 'new2.txt'
-    # with open(file1, 'r') as myfile:
-    #     a_string = myfile.read()
-    # # print(a_string)
-    # with open(file2, 'r') as myfile:
-    #     b_string = myfile.read()
+    file1 = 'hist1.txt'
+    file2 = 'hist2.txt'
+    with open(file1, 'r') as myfile:
+        a_string = myfile.read()
+    # print(a_string)
+    with open(file2, 'r') as myfile:
+        b_string = myfile.read()
     # print(b_string)
     # b_string = b'1\r\n123\r\n5\r\n12\r\n3\r\n4\r\n11\r\n32\r\n3\r\n3\r\n3\r\n5\r\n5\r\n4\r\n4\r\n4\r\n43\r\n34\r\n0\r\n34'
     # a_string = b'2\r\n110\r\n0\r\n7\r\n4\r\n4\r\n10\r\n34\r\n3\r\n3\r\n4\r\n4\r\n4\r\n4\r\n3\r\n4\r\n43\r\n34\r\n4\r\n3'
     try:
-        # image = executeHistogram(a_string, b_string, 2**2)
+        image = executeHistogram(a_string, b_string, 2**2)
         # image = executeGaussian(100, 2**4)
-        image = executeGaussian(1, 2**5)
-
+        # image = executeGaussian(1, 2**5)
+        #
         if PLTSHOW:
             plt.switch_backend('qt')
         else:
