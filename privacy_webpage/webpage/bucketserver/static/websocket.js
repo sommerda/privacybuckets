@@ -58,14 +58,17 @@ function ws_onMessage(evt)
     console_window.scrollTop = console_window.scrollHeight;
   }
   else if (msg.type == 'image_1'){
-    var img = document.createElement("img");
-    img.style.display = "block";
-    img.style.width = "500px";
-    img.src = msg.data;
-    document.getElementById("image_container").appendChild(img);
-
     // improper way to make the results visible:
     document.getElementById("finite_result").style.display = "block";
+
+    image_container = document.getElementById("image_container");
+
+    if(msg.data.type == 'base64string'){
+      create_base64string_plot(image_container, msg.data.data);
+    }
+    else if(msg.data.type == 'plotly'){
+      create_plotly_plots(image_container, msg.data.data)
+    }
   }
   else{
     console.log("Received Msg, type " + msg.type);

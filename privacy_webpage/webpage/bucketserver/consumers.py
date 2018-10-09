@@ -54,7 +54,8 @@ class Consumer(WebsocketConsumer):
                 self.send_console_output(output)
 
                 # sending images
-                image_answer = {'type': 'image_1', 'data': thread.image_1 }
+                image_container = {'type': thread.type, 'data': thread.image_1 }
+                image_answer = {'type': 'image_1', 'data': image_container }
                 self.send(json.dumps(image_answer))
 
                 # we are done
@@ -111,6 +112,9 @@ class ComputationThread(Thread):
         self.parameters = parameters
         self.distr_1 = distr_1
         self.distr_2 = distr_2
+
+        self.type = 'plotly'  # the type of data stored in image_1
+        #self.type = 'base64string'  # the type of data stored in image_1
 
         super(ComputationThread, self).__init__()
 
