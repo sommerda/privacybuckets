@@ -1,9 +1,10 @@
 # written by David Sommer (david.sommer at inf.ethz.ch), and Esfandiar Mohammadi (mohammadi at inf.ethz.ch)
 
-import sys
 import io
-import numpy as np
+import sys
+import json
 import base64
+import numpy as np
 from collections import OrderedDict
 
 import matplotlib
@@ -22,6 +23,12 @@ from core.probabilitybuckets_light import ProbabilityBuckets
 from core.tools import delta_dist_events, get_sufficient_big_factor, true_delta
 
 BACKGROUNDCOLOR = '#E6E6E8'
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
 
 
 class PBError(ValueError):
@@ -114,22 +121,22 @@ def convert_plots_to_hexstring(figures, eps_vector, titles, filetype='png'):
     for i, (title, plots) in enumerate(figures.items()):
         i += 1
         plt.subplot(3,1,i)
-        plt.title(title)
+        plt.title(plots['layout']['title'])
         logymin = 10**100
         logymax = -200
-        for index, plot in plots['dict'].items():
-            if 'ydata' in plot:
-                plt.semilogy(plot['xdata'], plot['ydata'], linestyle = plot['linestyle'],
+        for plot in plots['traces']:
+            if 'y' in plot:
+                plt.semilogy(plot['x'], plot['y'], linestyle = plot['linestyle'],
                             color = plot['color'], alpha = 0.5, label = plot['name'])
-                sanitizedy = plot['ydata'][np.nonzero(plot['ydata'])]
+                sanitizedy = plot['y'][np.nonzero(plot['y'])]
                 logymin = min(logymin, np.log10(np.min(sanitizedy)))
                 logymax = max(logymax, np.log10(np.max(sanitizedy)))
         yticks = np.logspace(logymin, logymax, num = 5)
         plt.yticks(yticks)
         plt.gca().yaxis.set_major_formatter(StrMethodFormatter('{x:.2E}'))
         plt.gca().yaxis.set_minor_formatter(NullFormatter())
-        plt.xlabel(plots['x axis'])
-        plt.ylabel(plots['y axis'])
+        plt.xlabel(plots['layout']['xaxis']['title'])
+        plt.ylabel(plots['layout']['yaxis']['title'])
         plt.legend()
 
     with io.BytesIO() as f:
@@ -140,8 +147,20 @@ def convert_plots_to_hexstring(figures, eps_vector, titles, filetype='png'):
 
     return 'data:image/' + filetype + ';base64, ' + b64string
 
+# shrinks large arrays by averaging. It trows values with index > step*final_length away!
+def shrink_by_averaging(array, final_length):
+    length = len(array)
+    final_length = int(final_length)
+    step = length // final_length  # integer divison
+    if step == 0:
+        step = 1
+        final_length = length
+    a = array[:step*final_length]
+    a = a.reshape((final_length, step))
+    return np.mean(a, axis=1)
 
-def construct_image(module_params, n, titles, dual = False):
+
+def construct_image(module_params, n, titles, dual = False, data_length_real_plot=1000, data_length_pld_plot=1000, plottype='plotly'):
 
     # Compute privacy buckets #
 
@@ -158,61 +177,69 @@ def construct_image(module_params, n, titles, dual = False):
 
     # Event space plots #
 
-    real_plots = {}
+    # REMARK: the keywords 'color' and 'linestyle' are for matplotlib, while 'mode' etc are for plotly.js
 
-    real_plots['dist1'] = {
-            'ydata': module_params['dist1_array'],
-            'xdata': range(len(module_params['dist1_array'])),
+    real_plots = []
+
+    real_plots.append({
+            'y': shrink_by_averaging(module_params['dist1_array'], data_length_real_plot),
+            'x': shrink_by_averaging(np.arange(len(module_params['dist1_array'])), data_length_real_plot),
             'name': 'distribution 1',
             'color': 'blue',
-            'linestyle': 'solid'
-            }
-    real_plots['dist2'] = {
-            'ydata': module_params['dist2_array'],
-            'xdata': range(len(module_params['dist2_array'])),
+            'linestyle': 'solid',
+            'mode': 'lines',
+    })
+    real_plots.append({
+            'y': shrink_by_averaging(module_params['dist2_array'], data_length_real_plot),
+            'x': shrink_by_averaging(np.arange(len(module_params['dist2_array'])), data_length_real_plot),
             'name': 'distribution 2',
             'color': 'brown',
-            'linestyle': 'dashed'
-            }
+            'linestyle': 'dashed',
+            'mode': 'lines',
+    })
 
     # Privacy Loss distribution plots #
 
-    pld_plots = {}
+    pld_plots = []
 
-    pld_plots['initial'] = {
-            'ydata': pb.bucket_distribution,
-            'xdata': (np.arange(len(pb.bucket_distribution))- pb.one_index ) * pb.log_factor,
+    pld_plots.append({
+            'y': shrink_by_averaging(pb.bucket_distribution, data_length_pld_plot),
+            'x': shrink_by_averaging((np.arange(len(pb.bucket_distribution))- pb.one_index ) * pb.log_factor, data_length_pld_plot),
             'name': 'initial',
             'color': 'blue',
             'linestyle': 'solid',
-    }
+            'mode': 'lines',
+    })
 
-    pld_plots['final'] = {
-            'ydata': pbn.bucket_distribution,
-            'xdata': (np.arange(len(pbn.bucket_distribution))- pbn.one_index ) * pbn.log_factor,
+    pld_plots.append({
+            'y': shrink_by_averaging(pbn.bucket_distribution, data_length_pld_plot),
+            'x': shrink_by_averaging((np.arange(len(pbn.bucket_distribution))- pbn.one_index ) * pbn.log_factor, data_length_pld_plot),
             'name': 'after composition',
             'color': 'brown',
             'linestyle': 'dashed',
-    }
+            'mode': 'lines',
+    })
 
     # ADP plots #
 
-    adp_plots = {}
+    adp_plots = []
 
-    adp_plots['pbup'] = {
-        'xdata': eps_vector,
+    adp_plots.append({
+        'x': eps_vector,
+        'y': pb_plot_data['pbup']['ydata'],
         'name': 'upper bound',
         'color': 'green',
         'linestyle': 'solid',
-        'ydata': pb_plot_data['pbup']['ydata']
-        }
-    adp_plots['pblow'] = {
-        'xdata': eps_vector,
-        'name': 'upper bound',
+        'mode': 'lines',
+    })
+    adp_plots.append({
+        'x': eps_vector,
+        'y': pb_plot_data['pblow']['ydata'],
+        'name': 'lower bound',
         'color': 'green',
         'linestyle': 'dashed',
-        'ydata': pb_plot_data['pblow']['ydata']
-        }
+        'mode': 'lines',
+    })
 
     # if False:
     #     # zCDP
@@ -231,24 +258,51 @@ def construct_image(module_params, n, titles, dual = False):
     figures = OrderedDict()
 
     figures['Event space'] = {
-            'dict': real_plots,
-            'x axis': 'event',
-            'y axis': 'Pr[event]'
-            }
+            'traces': real_plots,
+            'layout': {
+                'title': 'Event space',
+                'xaxis': {
+                    'title':'event',
+                },
+                'yaxis': {
+                    'title': 'Pr[event]',
+                },
+            },
+    }
 
     figures['Privacy loss distribution'] = {
-            'dict': pld_plots,
-            'x axis': 'ε',
-            'y axis': 'Loss(ε)'
-            }
+            'traces': pld_plots,
+            'layout': {
+                'title': 'Privacy loss distribution',
+                'xaxis': {
+                    'title': 'ε',
+                },
+                'yaxis': {
+                    'title': 'Loss(ε)'
+                },
+            },
+    }
 
     figures['ADP epsilon-delta graph'] = {
-            'dict': adp_plots,
-            'x axis': r'$\varepsilon$',
-            'y axis': r'$\delta(\varepsilon)$'
-            }
+            'traces': adp_plots,
+            #'x axis': r'$\varepsilon$',
+            #'y axis': r'$\delta(\varepsilon)$'
+            'layout': {
+                'title': 'ADP epsilon-delta graph',
+                'xaxis': {
+                    'title':'ε',
+                },
+                'yaxis': {
+                    'title':'δ(ε)',
+                },
+            },
+    }
 
-    image_1 = convert_plots_to_hexstring(figures, eps_vector, titles)
+    if plottype == 'matplotlib':
+        image_1 = convert_plots_to_hexstring(figures, eps_vector, titles)
+    elif plottype == 'plotly':
+        image_1 = json.dumps(figures, cls=NumpyEncoder)
+
     return image_1
 
 
