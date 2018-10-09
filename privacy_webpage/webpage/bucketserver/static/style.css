@@ -136,3 +136,14 @@ a.button {
     color: initial;
     display: inline;
 }
+
+div.plotlyplot { 
+    display: block;
+    width: 700px;
+    height: 320px;
+}
+
+img.base64stringplot {
+    display: block;
+    width:500px;
+}
