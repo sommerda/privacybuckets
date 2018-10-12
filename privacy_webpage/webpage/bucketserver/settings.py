@@ -54,7 +54,7 @@ ROOT_URLCONF = 'bucketserver.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [ os.path.join( BASE_DIR, "bucketserver/templates") ]
+        'DIRS': [ os.path.join( BASE_DIR, "bucketserver/templates") ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
