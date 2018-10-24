@@ -1,7 +1,8 @@
 // written by David Sommer (david.sommer at inf.ethz.ch)
 
 var websocket;
-var wsUri = "ws://" + window.location.host + "/analysis";
+var protocol = window.location.protocol === "http:" ? "ws://" : "wss://"
+var wsUri = protocol + window.location.host + "/analysis";
 var console_window;
 var has_submitted = false;
 
