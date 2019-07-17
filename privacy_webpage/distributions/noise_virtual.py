@@ -4,20 +4,24 @@ import numpy as np
 
 
 class Virtual_Noise_1D(object):
-    def __init__(self, eps, sensitivity = None, truncation_at=10, granularity=100, scale=1, target_distribution=None):
+    def __init__(self, eps, sensitivity = None, truncation_at=10, granularity=100, scale=1, target_distribution=None, truncation_at_right=None):
         """
         sensitivity = dummy parameter
 
-        truncation: distribution interval spreads (-truncation, truncation)
+        truncation_at_right: optional, if none it is set to truncation
+        
+        truncation: distribution interval spreads (-truncation, truncation_at_right)
 
         granularty: buckets per unit,
                         i.e. one will end up with "2 * truncation_at * granularity" number of events
 
         """
+        if truncation_at_right is None:
+            truncation_at_right = truncation_at
         width = float(2 * truncation_at)
         self.number_of_events = int(width * granularity + 1)
 
-        self.x_axis = np.linspace(-truncation_at, truncation_at, self.number_of_events, endpoint=True)
+        self.x_axis = np.linspace(-truncation_at, truncation_at_right, self.number_of_events, endpoint=True)
         self.distribution = target_distribution.pdf(self.x_axis, scale=scale)  # this should be done with the cdf
 
         # normalising
