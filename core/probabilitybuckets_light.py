@@ -72,6 +72,8 @@ class ProbabilityBuckets:
 
     def create_bucket_distribution(self, distr1, distr2, error_correction):
         self.logger.info("Create bucket distribution")
+        print(distr1)
+        print(distr2)
         assert len(distr1) == len(distr2)
 
         distr1 = np.array(distr1, dtype=np.float64)

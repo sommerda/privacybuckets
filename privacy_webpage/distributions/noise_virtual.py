@@ -18,7 +18,7 @@ class Virtual_Noise_1D(object):
         """
         if truncation_at_right is None:
             truncation_at_right = truncation_at
-        width = float(2 * truncation_at)
+        width = float(truncation_at + truncation_at_right)
         self.number_of_events = int(width * granularity + 1)
 
         self.x_axis = np.linspace(-truncation_at, truncation_at_right, self.number_of_events, endpoint=True)
@@ -39,8 +39,10 @@ class Virtual_Noise_1D_mechanism(object):
 
     The two outcomes are stored in self.y1 and self.y2, and an x-axis is provided by self.x
     """
-    def __init__(self, mean_diff, eps, truncation_at=10, granularity=100, scale=1, target_distribution=None):
-        self.noise = Virtual_Noise_1D(eps, None, truncation_at, granularity, scale, target_distribution)
+    def __init__(self, mean_diff, eps, truncation_at=10, granularity=100, scale=1, target_distribution=None, truncation_at_right = None):
+        if truncation_at_right is None:
+            truncation_at_right = truncation_at
+        self.noise = Virtual_Noise_1D(eps, None, truncation_at, granularity, scale, target_distribution, truncation_at_right = truncation_at_right)
 
         shift = int(mean_diff * granularity)  # round downwards
 
