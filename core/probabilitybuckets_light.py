@@ -134,8 +134,9 @@ class ProbabilityBuckets:
             self.real_error[0] = 0.0
 
         if self.infty_bucket > _infty_bucket_warning_bound:
-            self.logger.warning("Infty bucket (numerical errors) is above {:g}. This error will exponentiate over compositions. "
-                "Increase factor or number of buckets to avoid this.".format(_infty_bucket_warning_bound))
+            self.logger.warning("Infty bucket (numerical errors) is above {:g}. "
+                "This error will exponentiate over compositions. "
+                "Decrease factor or increase number of buckets to avoid this.".format(_infty_bucket_warning_bound))
 
     def squaring(self):
         self.logger.info("Squaring")
