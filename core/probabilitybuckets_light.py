@@ -13,6 +13,8 @@ import pickle
 import errno
 import xxhash
 
+_infty_bucket_warning_bound = 1e-5
+_virtual_error_warning_bound = 1e-3
 
 class ProbabilityBuckets:
 
@@ -25,15 +27,11 @@ class ProbabilityBuckets:
                  free_infty_budget = 10**(-20),
                  logging_level = logging.INFO,
                  error_correction = True,
-                 lazy_init = False,
+                 skip_bucketing = False,
                  **kwargs):
 
         self.logging_level = logging_level
         self.logger_setup(level=self.logging_level)
-
-        # for cases where we only want to create an "emtpy" instance to filly by hand (e.g., self.read method)
-        if lazy_init:
-            return
 
         for key in kwargs:
             self.logger.warning( "Warning: option {} not implemented".format(key) )
@@ -47,17 +45,24 @@ class ProbabilityBuckets:
         self.squaring_threshold_factor = np.float64(1.1)
         self.free_infty_budget = np.float64(free_infty_budget)
 
-        self.create_bucket_distribution(dist1_array, dist2_array, error_correction)
+        # in case of skip_bucketing = True, caching_setup() has to be called by the derived class as caching depends on a filled self.bucket_distribution
+        self.caching_super_directory = caching_directory
+        self.caching_directory = None   # will be set inside self.cacheing_setup() if self.caching_super_directory != None
 
+        # skip bucketing if someone else (e.g. derived class) creates buckets
+        if not skip_bucketing:
+            self.create_bucket_distribution(dist1_array, dist2_array, error_correction)
+            self.cacheing_setup()
+
+    def cacheing_setup(self):
         # setting up caching. Hashing beginning bucket_distribution to avoid name collisions
-        self.caching_directory = caching_directory
-        if caching_directory:
+        if self.caching_super_directory:
             hasher = xxhash.xxh64(self.bucket_distribution, seed=0)
             hasher.update(str(self.error_correction))
             hasher.update(str(self.free_infty_budget))
             array_name = hasher.hexdigest()
 
-            self.caching_directory = os.path.join(caching_directory, array_name)
+            self.caching_directory = os.path.join(self.caching_super_directory, array_name)
             self.logger.info("Caching directory: {}".format(self.caching_directory))
 
     def logger_setup(self, level):
@@ -71,6 +76,10 @@ class ProbabilityBuckets:
 
 
     def create_bucket_distribution(self, distr1, distr2, error_correction):
+        #
+        # For explanation of variables, see comment at the beginning of method "self.compose_with"
+        #
+
         self.logger.info("Create bucket distribution")
         assert len(distr1) == len(distr2)
 
@@ -123,6 +132,10 @@ class ProbabilityBuckets:
             self.virtual_error = virtual_error
             self.real_error = self.virtual_error.copy()
             self.real_error[0] = 0.0
+
+        if self.infty_bucket > _infty_bucket_warning_bound:
+            self.logger.warning("Infty bucket (numerical errors) is above {:g}. This error will exponentiate over compositions. "
+                "Increase factor or number of buckets to avoid this.".format(_infty_bucket_warning_bound))
 
     def squaring(self):
         self.logger.info("Squaring")
@@ -299,9 +312,11 @@ class ProbabilityBuckets:
 
         params = pickle.load(open(os.path.join(state_directory, "non_ndarray"),'rb'))
 
-        instance = cls(lazy_init=True, logging_level=params['logging_level'])
-
+        # If you search bugs with incomplete loaded states, look here.
+        # The "instance.__init__()"  method is *NOT* called when loading!
+        instance = cls.__new__(cls)
         instance.__dict__.update(params)
+        instance.logger_setup(instance.logging_level)
 
         instance.bucket_distribution = np.fromfile(os.path.join(state_directory, "bucket_distribution"), dtype=np.float64)
         if instance.error_correction:
@@ -399,17 +414,18 @@ class ProbabilityBuckets:
                         '   caching_directoy   : {}\n'
                         '   number_of_buckets  : {}\n'
                         '   factor             : {}\n'
-                        '   infty_bucket       : {}\n'
-                        '   disting_events     : {}\n'
+                        '   infty_bucket       : {}  (max 1.0, numerical error, should be < {:g})\n'
+                        '   disting_events     : {}  (max 1.0)\n'
                         '   minus-n-bucket     : {}\n'
                         '   sum bucket_distr   : {:.30f}\n'
-                        '   sum of all buckets : {:.30f}\n'
+                        '   sum of all buckets : {:.30f}  (should be 1.000000)\n'
                         '   delta_upper(eps=0) : {}'
                         .format(
                             self.caching_directory,
                             self.number_of_buckets,
                             self.factor,
                             self.infty_bucket,
+                            _infty_bucket_warning_bound,
                             self.distinguishing_events,
                             self.bucket_distribution[0],
                             sum_of_bucket_distr,
@@ -419,13 +435,15 @@ class ProbabilityBuckets:
         if self.error_correction:
             summary += ('\n'
                         '   delta_lower(eps=0) : {}\n'
-                        '   sum(virtual_error) : {}\n'
-                        '   sum(real_error)    : {}\n'
+                        '   sum(virtual_error) : {}   (max 1.0, should be < {:g})\n'
+                        '   sum(real_error)    : {}   (max 1.0, should be < {:g})\n'
                         '   the u              : {}'
                         .format(
                             self.delta_of_eps_lower_bound(0),
                             np.sum(self.virtual_error),
+                            _virtual_error_warning_bound,
                             np.sum(self.real_error),
+                            _virtual_error_warning_bound,
                             self.u,
                         ))
 
@@ -470,7 +488,7 @@ class ProbabilityBuckets:
     # needed for pickle (and deepcopy)
     def __getstate__(self):
         d = self.__dict__.copy()  # copy the dict since we change it
-        del d['logger']              # remove logger instance entry
+        del d['logger']           # remove logger instance entry
         return d
 
     def __setstate__(self, dict):
@@ -491,7 +509,7 @@ class ProbabilityBuckets:
             if exc.errno == errno.EEXIST and os.path.isdir(path):
                 pass
             else:
-                raise
+                raise exc
 
     def split_array_equally(self, arr):
         """
