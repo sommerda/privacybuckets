@@ -1,24 +1,29 @@
-# core
-An implementation of Privacy Buckets: A numerical tool to calculate privacy loss
+# Probability Buckets
 
-Implementation for the publication S. Meiser, E. Mohammadi, "Tight on Budget? Tight Bounds for r-Fold Approximate Differential Privacy", Proceedings of the 25th ACM Conference on Computer and Communications Security (CCS), 2018 [1]
+An implementation of Probability Buckets: A numerical tool to calculate privacy loss.
 
-On ePrint: https://eprint.iacr.org/2017/1034.pdf
+Implementation for the publication S. Meiser, E. Mohammadi, "Tight on Budget? Tight Bounds for r-Fold Approximate Differential Privacy", Proceedings of the 25th ACM Conference on Computer and Communications Security (CCS), 2018 [https://eprint.iacr.org/2017/1034.pdf](https://eprint.iacr.org/2017/1034.pdf) [1]
+
+For a analytic extension of the numerical buckets distribution with many additional insights, see Sommer et al. "Privacy loss classes: The central limit theorem in differential privacy", PoPETS, 2019  [https://eprint.iacr.org/2018/820.pdf](https://eprint.iacr.org/2018/820.pdf) [2]
 
 For how to use, see example.py. 
 
 For an example how to create your own bucket_distribution, see example_custom_bucketing.py
 
-For a analytic extension of the numerical buckets distribution with many additional insights, see Sommer et al. "Privacy loss classes: The central limit theorem in differential privacy." [2]
+For the correct choice of number_of_buckets and factor, see below.
 
-## The correct choice of number_of_buckets and factor (Voodoo Ritual)
+### Directory /core 
+
+The implementation of Probability Buckets is located in [/core/probabilitybuckets_light.py](./core/probabilitybuckets_light.py)
+
+#### The correct choice of number_of_buckets and factor (Voodoo Ritual)
 Given two distributions distribution_A and distribution_B, we want to evaluate the delta for a given epsilon. For details, see [1] and [2].
 
 The number_of_buckets defines the number of discretization steps the probability mass of events o of distribution_A will be distributed over, according to the privacy loss 
 
     L_A/B(o) = log  Pr[o <- distribution_A] / Pr[o <- distribution_B]. 
 
-The logarithm of the factor ( log(factor) ) is the average additive distance of the privacy losses for two events o that land in neighbouring buckets. The bucket_distribution can handle everything with a privacy loss 
+The logarithm of the factor ( log(factor) ) is the discretization step that each of the buckets spans. The probability-mass of events o of distribution_A that fall within the same discretization step will be put in the same bucket. The bucket_distribution is an array of consecutive buckets and can handle everything with a privacy loss 
 
     L_A/B(o) in [-log(factor)*number_of_buckets/2, log(factor)*number_of_buckets/2]. 
 
@@ -30,7 +35,7 @@ The factor, however, should be chosen carefully. Let the factor be arbitrary but
 
 	L_A/B(o) > log(factor) * number_of_buckets / 2 
 
-will land in the infinity bucket. And similar for the minus_n bucket. The 2 comes from the fact that half of the buckets handle the case where L_A/B(o) < 0. Therefore, choose the factor according to the acceptable probability mass outside the buckets (that will, under composition, contribute to the error exponentially):
+will land in the infinity bucket. Similar for the minus_n bucket. The 2 comes from the fact that half of the buckets handle the case where L_A/B(o) < 0. Therefore, choose the factor according to the acceptable probability mass outside the buckets (that will, under composition, contribute to the error exponentially):
 	
         max( |max_loss|, |min_loss| ) < log(factor) *  number_of_buckets / 2
 
@@ -47,13 +52,13 @@ If yout want to improve or automate the factor search, there is a helpfull insig
 
 Another improvement based on the moving Gaussian-shaped bucket-distribution might be to let the bucket-distribution move with the mean of the composed privacy loss distribution (such that the mean is always in the middle of the in-memory bucket_distribution, saving a lot of computations and memory). For additional details, contact the authors of [1,2]. 
 
-# privacy web-page
+### Directory /privacy-webpage
 The privacy web-page is built on top of the python web framework django and can be started from the directory "privacy_webpage/webpage" with the command "python3 manage.py runserver"
 
-# slides
+### Directory /slides
 The slides used to present privacy buckets at CCS'18
 
-# References
+## References
 
 [1] S. Meiser, E. Mohammadi, "Tight on Budget? Tight Bounds for r-Fold Approximate Differential Privacy", Proceedings of the 25th ACM Conference on Computer and Communications Security (CCS), 2018 (https://eprint.iacr.org/2017/1034.pdf)
 
