@@ -54,8 +54,8 @@ class ProbabilityBuckets_Binom(ProbabilityBuckets):
 
         self.create_bucket_distribution()
 
-        # Cacheing setup needs to be called after the buckets have been filled as the caching utilized a hash over the bucket distribution
-        self.cacheing_setup()
+        # Caching setup needs to be called after the buckets have been filled as the caching utilized a hash over the bucket distribution
+        self.caching_setup()
 
     def create_bucket_distribution(self):
         self.bucket_distribution = np.zeros(self.number_of_buckets, dtype=np.float64)

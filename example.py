@@ -48,9 +48,10 @@ number_of_buckets = 100000
 # The infinity-bucket gros exponentially with the number of compositions. Chose the factor according to the
 # probability mass you want to tolerate in the inifity bucket. For this example, the minimal factor should be
 #
-#   log(factor) > eps
+#       log(factor) > eps
 #
-# as for randomized response, there is no privacy loss L_A/B greater than epsilon. We set the factor to
+# as for randomized response, there is no privacy loss L_A/B greater than epsilon (excluding delta/infinity-bucket).
+# We set the factor to
 factor = 1 + 1e-4
 
 
@@ -64,7 +65,6 @@ privacybuckets = ProbabilityBuckets(
         free_infty_budget=10**(-20),  # how much we can put in the infty bucket before first squaring
         error_correction=True,  # error correction. See publication for details
         )
-
 
 # Now we evaluate how the distributon looks after 2**k independent compositions
 k = 13

@@ -41,20 +41,20 @@ class ProbabilityBuckets:
         self.factor = np.float64(factor)
         self.log_factor = np.log(factor, dtype=np.float64)
 
-        # arbitraryly chosen
+        # arbitrarily chosen
         self.squaring_threshold_factor = np.float64(1.1)
         self.free_infty_budget = np.float64(free_infty_budget)
 
         # in case of skip_bucketing = True, caching_setup() has to be called by the derived class as caching depends on a filled self.bucket_distribution
         self.caching_super_directory = caching_directory
-        self.caching_directory = None   # will be set inside self.cacheing_setup() if self.caching_super_directory != None
+        self.caching_directory = None   # will be set inside self.caching_setup() if self.caching_super_directory != None
 
-        # skip bucketing if someone else (e.g. derived class) creates buckets
+        # skip bucketing if something else (e.g. derived class) creates buckets
         if not skip_bucketing:
             self.create_bucket_distribution(dist1_array, dist2_array, error_correction)
-            self.cacheing_setup()
+            self.caching_setup()
 
-    def cacheing_setup(self):
+    def caching_setup(self):
         # setting up caching. Hashing beginning bucket_distribution to avoid name collisions
         if self.caching_super_directory:
             hasher = xxhash.xxh64(self.bucket_distribution, seed=0)
@@ -73,7 +73,6 @@ class ProbabilityBuckets:
             ch.setLevel(level=level)
             ch.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s: %(message)s'))
             self.logger.addHandler(ch)
-
 
     def create_bucket_distribution(self, distr1, distr2, error_correction):
         #
@@ -186,10 +185,10 @@ class ProbabilityBuckets:
         self.factor = np.exp(self.log_factor)
 
         gc.collect()
+
     def opt_compose_with(self, probability_buckets, after_squaring = False, threshold_factor = None):
         assert(after_squaring == False and threshold_factor == None), "Function is being called in an unsupported way. We should fix this."
         return self.compose_with(probability_buckets)
-
 
     def compose_with(self, pb, allow_modify_instance=False):
         self.logger.info("Composing")
