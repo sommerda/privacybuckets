@@ -17,7 +17,7 @@ For the correct choice of number_of_buckets and factor, see below.
 The implementation of Probability Buckets is located in [/core/probabilitybuckets_light.py](./core/probabilitybuckets_light.py)
 
 #### The correct choice of number_of_buckets and factor (Voodoo Ritual)
-Given two distributions distribution_A and distribution_B, we want to evaluate the delta for a given epsilon. For details, see [1] and [2].
+Given two probability distributions distribution_A and distribution_B, we want to evaluate the delta for a given epsilon. For details, see [1] and [2].
 
 The number_of_buckets defines the number of discretization steps the probability mass of events o of distribution_A will be distributed over, according to the privacy loss 
 
