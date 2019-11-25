@@ -485,6 +485,41 @@ class ProbabilityBuckets:
         vals[vals < 0] = 0  # = max(0, vals)
         return np.sum(vals) + self.distinguishing_events
 
+    def renyi_divergence_upper_bound(self, alpha):
+        """
+        returns a upper bound on the alpha renyi-divergence for a given alpha >= 1
+
+        R(aplha) = 1/(alpha - 1) * log_e E_{x~B} (A/B)^(alpha)    if alpha > 1
+        R(aplha) = E_{x~B} log_e (A/B)^(alpha)                    if alpha == 1
+        """
+
+        assert self.distinguishing_events == 0 and self.infty_bucket == 0, \
+                "Nonzero infty bucket or distingushing events not supported"
+
+        # if alpha == 1, the divergence is reduced to KL-divergence
+        if alpha == 1:
+            return self.KL_divergence()
+
+        # else, compute the renyi-divergence
+        lam = alpha - 1
+
+        # the alpha renyi moments are the alpha-1 moments of the exponentiated bucket_distribution. Informal,
+        # i.e. R(alpha) = 1/lam * ln E_{y~buckets} exp(y*lam)
+        #
+        # for additional details, see Lemma 8 in
+        # Sommer et al. "Privacy loss classes: The central limit theorem in differential privacy." PoPETS 2019.2
+
+        # to provide a upper bound, we assume that all content of a specific bucket manifests at the position
+        # with the highest leakage (most right)
+        summands = np.exp((np.arange(self.number_of_buckets) - self.one_index)*self.log_factor*lam)
+        expectation_value = np.sum(self.bucket_distribution*summands)
+        renyi_div = np.log(expectation_value) / lam
+
+        return renyi_div
+
+    def KL_divergence(self):
+        return np.sum(self.bucket_distribution * ((np.arange(self.number_of_buckets) - self.one_index)*self.log_factor))
+
     # needed for pickle (and deepcopy)
     def __getstate__(self):
         d = self.__dict__.copy()  # copy the dict since we change it
