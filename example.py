@@ -45,12 +45,13 @@ number_of_buckets = 100000
 #       L_A/B(o) = log(factor) * number_of_buckets / 2
 #
 # then the mass Pr[ L_A/B(o) > mass_infinity_bucket, o <- distribution_A] will be put into the infinity bucket.
-# The infinity-bucket gros exponentially with the number of compositions. Chose the factor according to the
+# The infinity-bucket grows exponentially with the number of compositions. Chose the factor according to the
 # probability mass you want to tolerate in the inifity bucket. For this example, the minimal factor should be
 #
-#       log(factor) > eps
+#       log(factor) > eps / ( number_of_buckets / 2 )
 #
-# as for randomized response, there is no privacy loss L_A/B greater than epsilon (excluding delta/infinity-bucket).
+# as for randomized response, there is no privacy loss L_A/B greater than epsilon (excluding delta/infinity-bucket), 
+# and we want to avoid putting probability mass with non-infinity privacy loss in the infinity_bucket. 
 # We set the factor to
 factor = 1 + 1e-4
 
