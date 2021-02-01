@@ -457,12 +457,19 @@ class ProbabilityBuckets:
 
     def _g_func(self, l):
         return (1 - self.factor**-l)
+
     def delta_of_eps(self, eps):
         return self.delta_of_eps_upper_bound(eps)
 
     def delta_of_eps_upper_bound(self, eps):
         # Use np.floor to guarantee an upper bound for the delta(eps) graph
         k = int(np.floor(eps / self.log_factor))
+
+        if k > self.number_of_buckets // 2:  # eps is above of bucket_distribution range
+            return self.infty_bucket + self.distinguishing_events
+        if k < -self.number_of_buckets // 2:  # eps is below of bucket_distribution range
+            k = -self.number_of_buckets // 2
+
         ret = np.sum(self._g_func(np.arange(1, self.one_index - k + 1)) * self.bucket_distribution[self.one_index + k + 1:])
         if self.error_correction:
             ret -= np.exp(eps) * np.sum( self.real_error[ min(self.one_index + k + self.u, self.number_of_buckets): ] )
@@ -479,6 +486,11 @@ class ProbabilityBuckets:
             return None
         # Use np.ceil to garantee an lower bound for the delta(eps) graph
         k = int(np.ceil(eps / self.log_factor))
+
+        if k > self.number_of_buckets // 2:  # eps is above of bucket_distribution range
+            return self.distinguishing_events
+        if k <= -self.number_of_buckets // 2:  # eps is below of bucket_distribution range
+            k = -self.number_of_buckets // 2 + 1
 
         vals = self._g_func(np.arange(1, self.one_index - k + 1)) * self.bucket_distribution[self.one_index + k + 1:]
         vals -= np.exp(eps) * self.virtual_error[self.one_index + k + 1:]
