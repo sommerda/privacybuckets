@@ -6,11 +6,19 @@ Implementation for the publication S. Meiser, E. Mohammadi, "Tight on Budget? Ti
 
 For a analytic extension of the numerical buckets distribution with many additional insights, see Sommer et al. "Privacy loss classes: The central limit theorem in differential privacy", PoPETS, 2019  [https://eprint.iacr.org/2018/820.pdf](https://eprint.iacr.org/2018/820.pdf) [2]
 
-For how to use, see example.py. 
+For how to use, see example_composition.py. 
 
-For an example how to create your own bucket_distribution, see example_custom_bucketing.py
+For an example on how to create your own bucket_distribution, see example_custom_bucketing.py
+
+For an example on how to generate Rényi-divergences, see example_Renyi_Differential_Privacy.py.
+
+For an example on how to construct a bucket distribution (a discrete privacy loss distribution [2]) froma an (epsilon, delta)-graph, see example_delta_func_to_buckets.py. 
 
 For the correct choice of number_of_buckets and factor, see below.
+
+### NEWS
+
+Supports now approximate differential privacy, probabilistic differential privacy, Renyi differential privacy, and the ability to construct a bucket distribution from an (epsilon, delta)-graph.
 
 ### Directory /core 
 
@@ -51,9 +59,6 @@ For more details, see the examples\*.py provided, and [1] and [2].
 If yout want to improve or automate the factor search, there is a helpfull insight given in [2]. It states that all bucketd_distributions converge towards a Gaussian distribution quite quickly under composition. The shape of this Gaussian is completely defined by the mean and variance of the initial bucket_distribution. Moreover, this work gives a precise and numericly stable formula to esimate the tail of such a Gaussian under composition without the need of convolving the bucket_distribution. Using this knowledge, the amount of probability mass that will end up in the infinity_bucket can be estimated. 
 
 Another improvement based on the moving Gaussian-shaped bucket-distribution might be to let the bucket-distribution move with the mean of the composed privacy loss distribution (such that the mean is always in the middle of the in-memory bucket_distribution, saving a lot of computations and memory). For additional details, contact the authors of [1,2]. 
-
-### Directory /privacy-webpage
-The privacy web-page is built on top of the python web framework django and can be started from the directory "privacy_webpage/webpage" with the command "python3 manage.py runserver"
 
 ### Directory /slides
 The slides used to present privacy buckets at CCS'18
