@@ -36,7 +36,7 @@ distribution_A = distribution_A/np.sum(distribution_A)
 distribution_B = distribution_B/np.sum(distribution_B)
 
 # For this kind of noise, we know the analytic expression of the Renyi-moments
-RDP_Gaussian_analytic = lambda alpha, sensitivity, sigma: alpha * (sensitivity**2) / (2*sigma**2)
+RDP_Gaussian_analytic = lambda alpha, sensitivity, sigma: alpha * (sensitivity**2) / (2 * sigma**2)
 # For details, see Lemma 2.4 in
 # Bun et al. "Concentrated differential privacy: Simplifications, extensions, and lower bounds." Theory of Cryptography Conference.
 

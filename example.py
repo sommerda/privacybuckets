@@ -45,24 +45,23 @@ number_of_buckets = 100000
 #       L_A/B(o) = log(factor) * number_of_buckets / 2
 #
 # then the mass Pr[ L_A/B(o) > mass_infinity_bucket, o <- distribution_A] will be put into the infinity bucket.
-# The infinity-bucket grows exponentially with the number of compositions. Chose the factor according to the
+# The infinity-bucket gros exponentially with the number of compositions. Chose the factor according to the
 # probability mass you want to tolerate in the inifity bucket. For this example, the minimal factor should be
 #
-#       log(factor) > eps / ( number_of_buckets / 2 )
+#       log(factor) > eps
 #
-# as for randomized response, there is no privacy loss L_A/B greater than epsilon (excluding delta/infinity-bucket), 
-# and we want to avoid putting probability mass with non-infinity privacy loss in the infinity_bucket. 
+# as for randomized response, there is no privacy loss L_A/B greater than epsilon (excluding delta/infinity-bucket).
 # We set the factor to
 factor = 1 + 1e-4
 
 
 # Initialize privacy buckets.
 privacybuckets = ProbabilityBuckets(
-        number_of_buckets = number_of_buckets,
-        factor = factor,
-        dist1_array = distribution_A,  # distribution A
-        dist2_array = distribution_B,  # distribution B
-        caching_directory = "./pb-cache",  # caching makes re-evaluations faster. Can be turned off for some cases.
+        number_of_buckets=number_of_buckets,
+        factor=factor,
+        dist1_array=distribution_A,  # distribution A
+        dist2_array=distribution_B,  # distribution B
+        caching_directory="./pb-cache",  # caching makes re-evaluations faster. Can be turned off for some cases.
         free_infty_budget=10**(-20),  # how much we can put in the infty bucket before first squaring
         error_correction=True,  # error correction. See publication for details
         )
@@ -77,9 +76,9 @@ privacybuckets_composed.print_state()
 
 
 # Now we build the delta(eps) graphs from the computed distribution.
-eps_vector =  np.linspace(0,3,100)
-upper_bound = [privacybuckets_composed.delta_of_eps_upper_bound(eps) for eps in eps_vector]
-lower_bound = [privacybuckets_composed.delta_of_eps_lower_bound(eps) for eps in eps_vector]
+eps_vector =  np.linspace(0, 3, 100)
+upper_bound = [privacybuckets_composed.delta_ADP_upper_bound(eps) for eps in eps_vector]
+lower_bound = [privacybuckets_composed.delta_ADP_lower_bound(eps) for eps in eps_vector]
 
 plt.plot(eps_vector, upper_bound, label="upper_bound")
 plt.plot(eps_vector, lower_bound, label="lower_bound")

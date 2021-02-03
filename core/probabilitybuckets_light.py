@@ -455,13 +455,28 @@ class ProbabilityBuckets:
     def convolve_full(self, x, y):
         return np.convolve(x, y, mode = 'full')
 
+    def delta_PDP(self, eps):
+        """ Returns upper bound for tight delta for probabilistic differential privacy. Error correction not supported. """
+        if self.error_correction:
+            self.logger.warning("Error correction for PDP delta not supported. Omit error correction.")
+
+        k = int(np.floor(eps / self.log_factor))
+
+        if k > self.number_of_buckets // 2:  # eps is above of bucket_distribution range
+            return self.infty_bucket + self.distinguishing_events
+        if k < -self.number_of_buckets // 2:  # eps is below of bucket_distribution range
+            k = -self.number_of_buckets // 2
+
+        return np.sum(self.bucket_distribution[self.one_index + k + 1:])
+
     def _g_func(self, l):
         return (1 - self.factor**-l)
 
-    def delta_of_eps(self, eps):
-        return self.delta_of_eps_upper_bound(eps)
+    def delta_ADP(self, eps):
+        """ Returns an upper bound for tight delta for approximate differntial privacy. Error correction is supported."""
+        return self.delta_ADP_upper_bound(eps)
 
-    def delta_of_eps_upper_bound(self, eps):
+    def delta_ADP_upper_bound(self, eps):
         # Use np.floor to guarantee an upper bound for the delta(eps) graph
         k = int(np.floor(eps / self.log_factor))
 
@@ -480,7 +495,7 @@ class ProbabilityBuckets:
         # assert np.all( a >= 0)
         return ret + self.infty_bucket + self.distinguishing_events
 
-    def delta_of_eps_lower_bound(self, eps):
+    def delta_ADP_lower_bound(self, eps):
         if not self.error_correction:
             self.logger.error("Error correction required for lower bound")
             return None
@@ -564,3 +579,16 @@ class ProbabilityBuckets:
         """
         mid = len(arr) // 2
         return arr[:mid], arr[mid + 1:]
+
+    #
+    # DEPRECATED method names
+    #
+
+    def delta_of_eps(self, eps):
+        self.delta_ADP_upper_bound(eps)
+
+    def delta_of_eps_upper_bound(self, eps):
+        self.delta_ADP_upper_bound(eps)
+
+    def delta_of_eps_lower_bound(self, eps):
+        self.delta_ADP_lower_bound(eps)

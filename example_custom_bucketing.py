@@ -144,7 +144,7 @@ privacybuckets_composed.print_state()
 
 # Now we build the delta(eps) graphs from the computed distribution.
 eps_vector =  np.linspace(0,3,100)
-upper_bound = [privacybuckets_composed.delta_of_eps_upper_bound(eps) for eps in eps_vector]
+upper_bound = [privacybuckets_composed.delta_ADP(eps) for eps in eps_vector]
 
 plt.plot(eps_vector, upper_bound, label="upper_bound")
 plt.legend()
