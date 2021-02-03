@@ -668,7 +668,7 @@ class ProbabilityBuckets_fromDelta(ProbabilityBuckets):
 
             elif DP_type == 'pdp':  # assuming delta_func describes probabilistic differential privacy
                 G = np.ones((self.number_of_buckets + 1, self.number_of_buckets + 1))
-                G = G[np.tril_indices(self.number_of_buckets + 1, -1)] = 0
+                G[np.tril_indices(self.number_of_buckets + 1, -1)] = 0
 
             else:
                 raise NotImplementedError("DP_type '{}' not implemented.".format(DP_type))
