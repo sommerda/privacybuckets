@@ -12,7 +12,7 @@ For an example on how to create your own bucket_distribution, see example_custom
 
 For an example on how to generate Rényi-divergences, see example_Renyi_Differential_Privacy.py.
 
-For an example on how to construct a bucket distribution (a discrete privacy loss distribution [2]) froma an (epsilon, delta)-graph, see example_delta_func_to_buckets.py. 
+For an example on how to construct a bucket distribution (a discrete privacy loss distribution [2]) from an (epsilon, delta)-graph, see example_delta_func_to_buckets.py. 
 
 For the correct choice of number_of_buckets and factor, see below.
 
