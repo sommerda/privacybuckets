@@ -592,3 +592,100 @@ class ProbabilityBuckets:
 
     def delta_of_eps_lower_bound(self, eps):
         self.delta_ADP_lower_bound(eps)
+
+
+class ProbabilityBuckets_fromDelta(ProbabilityBuckets):
+    """
+    Instructions besides the use of the parent ProbabilityBuckets class (which can be found there) can be found at
+    ProbabilityBuckets_fromDelta.create_bucket_distribution
+    """
+    def __init__(self, delta_func, DP_type, **kwargs):
+        """
+        delta_func: callable that returns a tight ADP or PDP delta for (positive and NEGATIVE) epsilons
+        DP_type = 'adp' | 'pdp' for aproximate or probabilistic differential privacy respectivly.
+        """
+
+        # Tell the parent __init__() method that we create our own bucket_distribution.
+        kwargs['skip_bucketing'] = True
+
+        # Our custom create_bucket_distribution() method does not set up the error correction
+        if 'error_correction' in kwargs and kwargs['error_correction']:
+            raise NotImplementedError("Error correction not supported.")
+        kwargs['error_correction'] = False
+
+        super(ProbabilityBuckets_fromDelta, self).__init__(**kwargs)
+
+        self.create_bucket_distribution(delta_func, DP_type)
+
+        # Caching setup needs to be called after the buckets have been filled as the caching utilized a hash over the bucket distribution
+        self.caching_setup()
+
+    def create_bucket_distribution(self, delta_func, DP_type):
+        """
+        This foo fits a bucket_distribution to a delta_func(epsilon) function using a non-negative least squares fit.
+        'delta_func' needs to accept negative epsilons as well. Error correction is not supported.
+        It makes use of the defintion of tight approximate differential privacy (see [1])
+
+            delta(epsilon) = bucket(infinity) + sum_{y_i>epsislon}  (1 - exp(eps - y_i)) bucket(y_i)
+
+        or in the probablistic differential privacy case
+
+            delta(epsilon) = bucket(infinity) + sum_{y_i>epsislon} bucket(y_i)
+
+        For 'number_of_buckets + 2' epsilons, we create a matrix G containing the terms (1 - exp(eps - y_i)) such that
+        we can find the buckets given delta(eps) and G:
+
+            bucket_distribution = min_{bucket_distr} G.dot(bucket_distr) - [ delta(eps) for eps in eps_vector]
+
+        with bucket_distr_i > 0 for all i. Please note that this method may lead to numerical errors with a large
+        number_of_buckets or small amounts of probability mass in single buckets.
+
+        [1] Sommer, David M., Sebastian Meiser, and Esfandiar Mohammadi. "Privacy loss classes: The central limit
+            theorem in differential privacy." PoPETS 2019.2 (2019)
+        """
+        import scipy
+
+        self.bucket_distribution = np.zeros(self.number_of_buckets, dtype=np.float64)
+        self.error_correction = False
+
+        # the eps vector we use for delta generation. We should have one value within
+        eps_vec = ( np.arange(self.number_of_buckets + 1) - self.number_of_buckets // 2 - 1) * self.log_factor
+
+        # The deltas we search to mimick with our future distribution.
+        delta_vec = [ delta_func(eps) for eps in eps_vec ]
+
+        # Generating G, the coefficient matrix for which we try to solve min_w  G.dot(w) - delta_func(eps_vec)
+        try:
+            if DP_type == 'adp':  # assuming delta_func describes approximate differential privacy
+                # y: our base points (right edge of each bucket)
+                y = ( np.arange(self.number_of_buckets) - self.number_of_buckets // 2 ) * self.log_factor
+
+                y = y.reshape((1, len(y)))
+                eps_vec = eps_vec.reshape((len(eps_vec), 1))
+
+                G = np.maximum(0, 1 - np.exp(eps_vec - y))
+                G = np.append(G, np.ones((self.number_of_buckets + 1, 1)), axis=1)  # for the infty bucket
+
+            elif DP_type == 'pdp':  # assuming delta_func describes probabilistic differential privacy
+                G = np.ones((self.number_of_buckets + 1, self.number_of_buckets + 1))
+                G = G[np.tril_indices(self.number_of_buckets + 1, -1)] = 0
+
+            else:
+                raise NotImplementedError("DP_type '{}' not implemented.".format(DP_type))
+
+        except MemoryError as e:
+            raise MemoryError("Insufficient memory. Use smaller number_of_buckets.") from e
+
+        # we try to solve min_w  G.dot(w) - delta_func(eps_vec) with w_i > 0 forall i
+        w = scipy.optimize.nnls(G, delta_vec, maxiter=10 * G.shape[1])[0]
+
+        self.bucket_distribution = w[:-1].copy()
+
+        self.infty_bucket = w[-1]
+
+        # distinguishing_events is zero as we cannot distinguish between infty bucket and distinguishing events
+        self.distinguishing_events = np.float64(0.0)
+
+        # and some internal stuff
+        self.one_index = int(self.number_of_buckets // 2)   # this is a shortcut to the 0-bucket where L_A/B ~ 1
+        self.u = np.int64(1)   # for error correction. Actually not needed
