@@ -585,13 +585,16 @@ class ProbabilityBuckets:
     #
 
     def delta_of_eps(self, eps):
-        self.delta_ADP_upper_bound(eps)
+        """Deprecated. Use '.delta_ADP_upper_bound(eps)'"""
+        return self.delta_ADP_upper_bound(eps)
 
     def delta_of_eps_upper_bound(self, eps):
-        self.delta_ADP_upper_bound(eps)
+        """Deprecated. Use '.delta_ADP_upper_bound(eps)'"""
+        return self.delta_ADP_upper_bound(eps)
 
     def delta_of_eps_lower_bound(self, eps):
-        self.delta_ADP_lower_bound(eps)
+        """Deprecated. Use '.delta_ADP_lower_bound(eps)'"""
+        return self.delta_ADP_lower_bound(eps)
 
 
 class ProbabilityBuckets_fromDelta(ProbabilityBuckets):
