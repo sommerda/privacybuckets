@@ -467,7 +467,7 @@ class ProbabilityBuckets:
         if k < -self.number_of_buckets // 2:  # eps is below of bucket_distribution range
             k = -self.number_of_buckets // 2
 
-        return np.sum(self.bucket_distribution[self.one_index + k + 1:])
+        return np.sum(self.bucket_distribution[self.one_index + k + 1:]) + self.infty_bucket + self.distinguishing_events
 
     def _g_func(self, l):
         return (1 - self.factor**-l)
