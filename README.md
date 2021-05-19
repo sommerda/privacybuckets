@@ -18,6 +18,8 @@ For the correct choice of number_of_buckets and factor, see below.
 
 ### NEWS
 
+Provides now a class method returning an epsilon for a given target-delta. Previously, only the reverse was implemented. 
+
 Supports now approximate differential privacy, probabilistic differential privacy, Renyi differential privacy, and the ability to construct a bucket distribution from an (epsilon, delta)-graph.
 
 ### Directory /core 

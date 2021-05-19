@@ -1,5 +1,6 @@
 # written by David Sommer (david.sommer at inf.ethz.ch)
 
+import traceback
 import numpy as np
 from core.probabilitybuckets_light import ProbabilityBuckets
 from matplotlib import pyplot as plt
@@ -77,17 +78,54 @@ privacybuckets_composed.print_state()
 
 # Now we build the delta(eps) graphs from the computed distribution.
 eps_vector =  np.linspace(0, 3, 100)
-upper_bound = [privacybuckets_composed.delta_ADP_upper_bound(eps) for eps in eps_vector]
-lower_bound = [privacybuckets_composed.delta_ADP_lower_bound(eps) for eps in eps_vector]
+upper_bound_delta = [privacybuckets_composed.delta_ADP_upper_bound(eps) for eps in eps_vector]
+lower_bound_delta = [privacybuckets_composed.delta_ADP_lower_bound(eps) for eps in eps_vector]
 
-plt.plot(eps_vector, upper_bound, label="upper_bound")
-plt.plot(eps_vector, lower_bound, label="lower_bound")
+plt.plot(eps_vector, upper_bound_delta, label="upper_bound")
+plt.plot(eps_vector, lower_bound_delta, label="lower_bound")
 plt.legend()
 plt.title("Extended Randomized response with eps={:e}, delta={:f} after {:d} compositions".format(eps_rr, delta, 2**k))
 plt.xlabel("eps")
 plt.ylabel("delta")
 plt.ticklabel_format(useOffset=False)  # Hotfix for the behaviour of my current matplotlib version
 plt.show()
+
+
+# we can ask for a specific epsilon (upper bound) for a given delta directly.
+# for illustration purposes, we do not just switch axis of the previous plot but call also the corresponding method.
+delta_vector = np.linspace(0.75, 0.57, 100)
+upper_bound_eps = [privacybuckets_composed.eps_ADP_upper_bound(delta) for delta in delta_vector]
+
+plt.plot(delta_vector, upper_bound_eps, '--', alpha=0.5, label="upper_bound (class method)")
+plt.plot(upper_bound_delta, eps_vector, alpha=0.5, label="upper_bound (axis switch of previous plot)")
+plt.legend()
+plt.title("Extended Randomized response with eps={:e}, delta={:f} after {:d} compositions".format(eps_rr, delta, 2**k))
+plt.xlabel("delta")
+plt.ylabel("eps")
+plt.ticklabel_format(useOffset=False)  # Hotfix for the behaviour of my current matplotlib version
+plt.show()
+
+
+# Illustration what happens when we call ProbabilityBuckets.eps_ADP_upper_bound(delta) with a unsuitable delta
+try:
+    eps = privacybuckets_composed.eps_ADP_upper_bound(delta=.5)
+except ValueError as e:
+    print("")
+    print("[*] THIS IS AN INTENTIONALLY INDUCED ERROR FOR ILLUSTRATION PURPOSES!")
+    print("    (target delta was too small.)")
+    print("")
+
+    traceback.print_exc()
+
+    print("")
+    print("[*] THIS WAS AN INTENTIONALLY INDUCED ERROR FOR ILLUSTRATION PURPOSES!")
+    print("    (target delta was too small.)")
+    print("")
+
+print("[*] Here, the target delta is too big.")
+eps = privacybuckets_composed.eps_ADP_upper_bound(delta=0.9)
+print(f"for delta=0.9: eps={eps}")
+print("")
 
 
 # abusing internals, we can look at the bucket distribution

@@ -6,6 +6,7 @@
 
 import logging
 import numpy as np
+from scipy import optimize
 import copy
 import gc
 import os
@@ -512,6 +513,32 @@ class ProbabilityBuckets:
         vals[vals < 0] = 0  # = max(0, vals)
         return np.sum(vals) + self.distinguishing_events
 
+    def eps_ADP_upper_bound(self, delta):
+        """
+        Returns an upper bound of epsilon for a target delta. Throws descriptive errors if it cannot satisfy the
+        conditions. Without error correction, the optimizer might not converge properly.
+        """
+        if not self.error_correction:
+            self.logger.warning("Error-correction disabled, optimizer might not converge properly.")
+
+        # The maximal epsilon we can serve. For any epsilons larger, self.delta_ADP_upper_bound will return the
+        # delta of the infinity bucket+dist_events only, rendering upper-bound-epsilon=np.inf
+        max_eps = (self.number_of_buckets // 2 ) * self.log_factor
+
+        try:
+            root = optimize.bisect(lambda eps: self.delta_ADP_upper_bound(eps) - delta, 0, max_eps)
+        except ValueError as e:
+            if self.delta_ADP_upper_bound(eps=max_eps) > delta:
+                raise ValueError("Required target-delta is smaller than self.delta_ADP_upper_bound(max_eps) can serve. "
+                                 "For an instant remedy, increase number_of_buckets, or increase factor.")
+            elif self.delta_ADP_upper_bound(eps=0.0) < delta:
+                self.logger.warning("Returning over-approximation eps=0. "
+                                    "(self.delta_ADP_upper_bound(eps=0) < target-delta)")
+                return 0.0
+            raise e
+
+        return root
+
     def renyi_divergence_upper_bound(self, alpha):
         """
         returns a upper bound on the alpha renyi-divergence for a given alpha >= 1
@@ -680,7 +707,7 @@ class ProbabilityBuckets_fromDelta(ProbabilityBuckets):
             raise MemoryError("Insufficient memory. Use smaller number_of_buckets.") from e
 
         # we try to solve min_w  G.dot(w) - delta_func(eps_vec) with w_i > 0 forall i
-        w = scipy.optimize.nnls(G, delta_vec, maxiter=10 * G.shape[1])[0]
+        w = optimize.nnls(G, delta_vec, maxiter=10 * G.shape[1])[0]
 
         self.bucket_distribution = w[:-1].copy()
 
